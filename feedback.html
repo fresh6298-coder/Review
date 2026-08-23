@@ -174,6 +174,23 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .item-actions button {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+  }
+  .item-actions button:hover { background: #f3f4f6; }
+  .item-actions .delete-btn:hover { color: var(--danger); border-color: var(--danger); }
   .empty {
     color: var(--muted);
     font-size: 14px;
@@ -355,7 +372,7 @@
     feedbackRef.orderByChild('createdAt').on('value', (snapshot) => {
       const items = [];
       snapshot.forEach((child) => {
-        items.push(child.val());
+        items.push({ key: child.key, ...child.val() });
       });
       items.reverse(); // 최신순
       currentItems = items;
@@ -374,11 +391,45 @@
             <span class="page-tag">p.${escapeHtml(item.page)}</span>
           </div>
           <div class="content">${escapeHtml(item.content)}</div>
+          <div class="item-actions">
+            <button type="button" class="edit-btn" data-key="${item.key}">✏️ 수정</button>
+            <button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button>
+          </div>
         </div>
       `).join('');
     }, (err) => {
       console.error(err);
       setStatus('목록을 불러오지 못했습니다: ' + err.message, 'error');
+    });
+
+    listEl.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.edit-btn');
+      const deleteBtn = e.target.closest('.delete-btn');
+
+      if (editBtn) {
+        const item = currentItems.find((i) => i.key === editBtn.dataset.key);
+        if (!item) return;
+        const updated = prompt('피드백 내용을 수정하세요:', item.content);
+        if (updated === null) return;
+        const trimmed = updated.trim();
+        if (!trimmed) {
+          alert('내용을 비워둘 수 없습니다.');
+          return;
+        }
+        feedbackRef.child(item.key).update({ content: trimmed }).catch((err) => {
+          alert('수정에 실패했습니다: ' + err.message);
+        });
+      }
+
+      if (deleteBtn) {
+        const item = currentItems.find((i) => i.key === deleteBtn.dataset.key);
+        if (!item) return;
+        const ok = confirm(`"${item.name}"님이 작성한 아래 피드백을 삭제할까요?\n\n${item.content}`);
+        if (!ok) return;
+        feedbackRef.child(item.key).remove().catch((err) => {
+          alert('삭제에 실패했습니다: ' + err.message);
+        });
+      }
     });
   }
 
