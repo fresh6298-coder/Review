@@ -4,94 +4,151 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>피드백 게시판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f6f8;
-    --card-bg: #ffffff;
-    --border: #e2e4e8;
-    --text: #1f2328;
-    --muted: #6b7280;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --danger: #b91c1c;
+    --paper: #f6f7f5;
+    --surface: #ffffff;
+    --surface-alt: #eef1ee;
+    --ink: #15191a;
+    --sub: #5c655f;
+    --dim: #8b948d;
+    --line: #e1e5e0;
+    --accent: #189c47;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3f5ea;
+    --danger: #c0392b;
+    --warn-bg: #fdf6e3;
+    --warn-line: #e8d9a0;
+    --shadow: 0 1px 2px rgba(20,30,20,.05), 0 8px 24px rgba(20,30,20,.07);
+    --en: 'Manrope', 'Pretendard Variable', sans-serif;
+    --kr: 'Noto Sans KR', 'Pretendard Variable', 'Malgun Gothic', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121212;
+      --surface: #181818;
+      --surface-alt: #1f1f1f;
+      --ink: #ffffff;
+      --sub: #bdbdbd;
+      --dim: #8e8e8e;
+      --line: #2c2f2c;
+      --accent: #1ed760;
+      --accent-ink: #0d0d0d;
+      --accent-soft: rgba(30,215,96,.14);
+      --danger: #f3727f;
+      --warn-bg: rgba(255,196,64,.08);
+      --warn-line: rgba(255,196,64,.28);
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.5);
+    }
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    padding: 24px 16px 64px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
+    padding: 40px 16px 96px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--kr);
   }
   .wrap {
     max-width: 640px;
     margin: 0 auto;
   }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--en);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .brand i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: block;
+  }
   h1 {
-    font-size: 22px;
-    margin: 0 0 4px;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+    margin: 0 0 6px;
   }
   .subtitle {
-    color: var(--muted);
+    color: var(--sub);
     font-size: 14px;
-    margin: 0 0 20px;
+    margin: 0 0 16px;
   }
   .material-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     margin: 0 0 20px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    background: #eef2ff;
-    color: #4338ca;
-    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--en);
+    font-size: 12px;
     font-weight: 700;
     text-decoration: none;
   }
-  .material-link:hover { background: #e0e7ff; }
   details.setup {
-    background: #fff7e6;
-    border: 1px solid #f0d999;
-    border-radius: 10px;
-    padding: 12px 16px;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-line);
+    border-radius: 12px;
+    padding: 14px 18px;
     margin-bottom: 20px;
     font-size: 13px;
     line-height: 1.6;
+    color: var(--ink);
   }
   details.setup summary {
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
   }
   details.setup code {
-    background: #00000010;
+    background: rgba(0,0,0,.08);
     padding: 1px 5px;
     border-radius: 4px;
   }
   .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-top: 20px;
   }
   .card h2 {
-    font-size: 16px;
-    margin: 0 0 14px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    margin: 0 0 16px;
   }
   label {
     display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin: 12px 0 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--sub);
+    margin: 14px 0 6px;
   }
   input[type="text"], textarea, select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
     font-size: 14px;
-    font-family: inherit;
-    background: #fff;
-    color: var(--text);
+    font-family: var(--kr);
+    background: var(--paper);
+    color: var(--ink);
   }
   textarea {
     min-height: 90px;
@@ -102,110 +159,125 @@
     border-color: var(--accent);
   }
   button[type="submit"] {
-    margin-top: 16px;
+    margin-top: 18px;
     width: 100%;
-    padding: 11px;
+    padding: 13px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     background: var(--accent);
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
+    color: var(--accent-ink);
+    font-size: 14.5px;
+    font-weight: 800;
     cursor: pointer;
   }
-  button[type="submit"]:hover { background: var(--accent-hover); }
-  button[type="submit"]:disabled { background: #9ca3af; cursor: not-allowed; }
+  button[type="submit"]:disabled { background: var(--dim); cursor: not-allowed; }
   #status-msg {
     font-size: 13px;
     margin-top: 10px;
     min-height: 16px;
   }
   #status-msg.error { color: var(--danger); }
-  #status-msg.ok { color: #15803d; }
+  #status-msg.ok { color: var(--accent); }
   .list-header {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 4px;
   }
-  .list-header h2 { margin: 0; font-size: 16px; }
-  .count { color: var(--muted); font-size: 13px; }
+  .list-header h2 { margin: 0; }
+  .list-header .right { display: flex; align-items: center; gap: 10px; }
+  .count { color: var(--dim); font-family: var(--en); font-size: 12px; font-weight: 700; }
   .export-btn {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
+    padding: 6px 13px;
+    border: 1px solid var(--line);
     border-radius: 999px;
-    background: #fff;
-    color: var(--text);
-    font-size: 12px;
-    font-weight: 700;
+    background: var(--surface-alt);
+    color: var(--sub);
+    font-family: var(--en);
+    font-size: 11.5px;
+    font-weight: 800;
     cursor: pointer;
   }
-  .export-btn:hover { background: #f3f4f6; }
-  .feedback-item {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-  }
-  .feedback-item .meta {
+  .export-btn:hover { background: var(--accent-soft); color: var(--accent); }
+  .entries { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .entry {
     display: flex;
-    gap: 8px;
-    align-items: baseline;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .avatar {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: var(--en);
     font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 6px;
+    font-weight: 800;
+    background: var(--accent-soft);
+    color: var(--accent);
   }
-  .feedback-item .name {
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .entry-name { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .page-tag {
+    font-family: var(--en);
+    font-size: 11px;
     font-weight: 700;
-    color: var(--text);
-    font-size: 14px;
-  }
-  .feedback-item .page-tag {
-    background: #eef2ff;
-    color: #4338ca;
+    color: var(--accent);
+    background: var(--accent-soft);
     border-radius: 6px;
     padding: 1px 8px;
-    font-size: 12px;
-    font-weight: 600;
   }
-  .feedback-item .content {
+  .entry-content {
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.55;
+    color: var(--sub);
     white-space: pre-wrap;
     word-break: break-word;
   }
-  .item-actions {
+  .entry-actions {
     display: flex;
     gap: 8px;
     margin-top: 10px;
   }
-  .item-actions button {
-    border: 1px solid var(--border);
-    background: #fff;
+  .entry-actions button {
+    border: 1px solid var(--line);
+    background: transparent;
     border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 3px 9px;
+    font-size: 11.5px;
+    font-weight: 700;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--dim);
   }
-  .item-actions button:hover { background: #f3f4f6; }
-  .item-actions .delete-btn:hover { color: var(--danger); border-color: var(--danger); }
+  .entry-actions button:hover { background: var(--surface-alt); }
+  .entry-actions .delete-btn:hover { color: var(--danger); border-color: var(--danger); }
   .empty {
-    color: var(--muted);
+    color: var(--dim);
     font-size: 14px;
     text-align: center;
-    padding: 24px 0;
+    padding: 28px 0;
   }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="brand"><i></i>SIGNAL PITCH DAY</div>
   <h1>피드백 게시판</h1>
   <p class="subtitle">이름 / 페이지 / 피드백 내용을 남기면 아래 메인 목록에 모두와 공유됩니다.</p>
 
   <a href="signal-pitchday.html" target="_blank" rel="noopener" class="material-link">
-    📊 SIGNAL Pitch Day 자료 보기 (새 창)
+    📊 자료 보기 (새 창)
   </a>
 
   <details class="setup">
@@ -218,7 +290,7 @@
       <li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase 콘솔</a>에서 무료 프로젝트를 하나 만듭니다.</li>
       <li>왼쪽 메뉴에서 <strong>Build → Realtime Database</strong>로 들어가 데이터베이스를 생성합니다 (지역은 아무 곳이나 선택 가능).</li>
       <li><strong>Rules</strong> 탭에서 아래처럼 설정 후 게시(Publish)합니다. (개인/소규모용 간단 설정이며, 외부에 공개되는 게시판이라면 나중에 더 강화하는 것을 권장합니다.)
-        <pre style="white-space:pre-wrap;background:#00000010;padding:8px;border-radius:6px;">{
+        <pre style="white-space:pre-wrap;background:rgba(0,0,0,.08);padding:8px;border-radius:6px;">{
   "rules": {
     "feedbacks": {
       ".read": true,
@@ -255,7 +327,7 @@
   <div class="card">
     <div class="list-header">
       <h2>메인 (전체 피드백)</h2>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div class="right">
         <span class="count" id="feedback-count"></span>
         <button type="button" id="export-btn" class="export-btn">📥 HTML로 내보내기</button>
       </div>
@@ -338,6 +410,10 @@
     const db = firebase.database();
     const feedbackRef = db.ref('feedbacks');
 
+    function initial(name) {
+      return (name || '').trim().charAt(0) || '?';
+    }
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -384,19 +460,22 @@
         return;
       }
 
-      listEl.innerHTML = items.map((item) => `
-        <div class="feedback-item">
-          <div class="meta">
-            <span class="name">${escapeHtml(item.name)}</span>
-            <span class="page-tag">p.${escapeHtml(item.page)}</span>
-          </div>
-          <div class="content">${escapeHtml(item.content)}</div>
-          <div class="item-actions">
-            <button type="button" class="edit-btn" data-key="${item.key}">✏️ 수정</button>
-            <button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button>
+      listEl.innerHTML = `<div class="entries">${items.map((item) => `
+        <div class="entry">
+          <div class="avatar">${escapeHtml(initial(item.name))}</div>
+          <div class="entry-body">
+            <div class="entry-top">
+              <span class="entry-name">${escapeHtml(item.name)}</span>
+              <span class="page-tag">p.${escapeHtml(item.page)}</span>
+            </div>
+            <div class="entry-content">${escapeHtml(item.content)}</div>
+            <div class="entry-actions">
+              <button type="button" class="edit-btn" data-key="${item.key}">✏️ 수정</button>
+              <button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button>
+            </div>
           </div>
         </div>
-      `).join('');
+      `).join('')}</div>`;
     }, (err) => {
       console.error(err);
       setStatus('목록을 불러오지 못했습니다: ' + err.message, 'error');
