@@ -445,16 +445,31 @@
     });
     const pageLabels = Object.keys(grouped).sort();
     const generatedAt = new Date().toLocaleString('ko-KR');
+    const pageNo = (label) => (label.split('·')[0] || '').trim();
+    const initial = (name) => (name || '').trim().charAt(0) || '?';
 
-    const sections = pageLabels.map((page) => `
-      <section>
-        <h2>${escapeHtml(page)}</h2>
-        ${grouped[page].map((item) => `
-          <div class="fb-item">
-            <div class="fb-meta">${escapeHtml(item.name)}</div>
-            <div class="fb-content">${escapeHtml(item.content)}</div>
-          </div>
-        `).join('')}
+    const chips = pageLabels.map((label) => `
+      <a href="#p${escapeHtml(pageNo(label))}"><b>${escapeHtml(pageNo(label))}</b> · ${grouped[label].length}건</a>
+    `).join('');
+
+    const sections = pageLabels.map((label) => `
+      <section class="page" id="p${escapeHtml(pageNo(label))}">
+        <div class="page-head">
+          <span class="no">${escapeHtml(pageNo(label))}</span>
+          <h2>${escapeHtml(label.split('·').slice(1).join('·').trim())}</h2>
+          <span class="cnt">${grouped[label].length}건</span>
+        </div>
+        <div class="entries">
+          ${grouped[label].map((item) => `
+            <div class="entry">
+              <div class="avatar">${escapeHtml(initial(item.name))}</div>
+              <div class="entry-body">
+                <div class="entry-name">${escapeHtml(item.name)}</div>
+                <div class="entry-content">${escapeHtml(item.content)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
       </section>
     `).join('');
 
@@ -464,23 +479,70 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>피드백 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:32px 20px 64px; max-width:720px; margin-left:auto; margin-right:auto;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic",sans-serif;
-    color:#1f2328; background:#f5f6f8; }
-  h1 { font-size:22px; margin:0 0 4px; }
-  .meta { color:#6b7280; font-size:13px; margin-bottom:28px; }
-  section { margin-bottom:26px; }
-  h2 { font-size:15px; color:#1f2328; border-bottom:2px solid #2563eb; padding-bottom:8px; margin-bottom:12px; }
-  .fb-item { background:#fff; border:1px solid #e2e4e8; border-radius:10px; padding:14px 16px; margin-bottom:10px; }
-  .fb-meta { font-weight:700; font-size:13px; margin-bottom:6px; }
-  .fb-content { font-size:14px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
+  :root {
+    --paper: #f6f7f5; --surface: #ffffff; --surface-alt: #eef1ee;
+    --ink: #15191a; --sub: #5c655f; --dim: #8b948d; --line: #e1e5e0;
+    --accent: #189c47; --accent-soft: #e3f5ea;
+    --shadow: 0 1px 2px rgba(20,30,20,.05), 0 8px 24px rgba(20,30,20,.07);
+    --en: 'Manrope','Pretendard Variable',sans-serif;
+    --kr: 'Noto Sans KR','Pretendard Variable','Malgun Gothic',sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121212; --surface: #181818; --surface-alt: #1f1f1f;
+      --ink: #ffffff; --sub: #bdbdbd; --dim: #8e8e8e; --line: #2c2f2c;
+      --accent: #1ed760; --accent-soft: rgba(30,215,96,.14);
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--kr); padding:48px 20px 96px; }
+  .sheet { max-width:760px; margin:0 auto; }
+  .head { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:28px 30px; box-shadow:var(--shadow); margin-bottom:28px; }
+  .head .brand { display:flex; align-items:center; gap:8px; font-family:var(--en); font-size:11px; font-weight:800; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
+  .head .brand i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:block; }
+  .head h1 { font-size:24px; font-weight:900; letter-spacing:-0.6px; margin:0 0 18px; text-wrap:balance; }
+  .stats { display:flex; gap:28px; padding-top:16px; border-top:1px solid var(--line); flex-wrap:wrap; }
+  .stat .n { font-family:var(--en); font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-0.5px; }
+  .stat .n span { color:var(--accent); }
+  .stat .l { font-size:12px; color:var(--sub); font-weight:500; margin-top:2px; }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:18px; }
+  .chips a { font-family:var(--en); font-size:12px; font-weight:700; color:var(--sub); background:var(--surface-alt); border:1px solid var(--line); border-radius:999px; padding:5px 12px; text-decoration:none; }
+  .chips a b { color:var(--accent); font-weight:800; }
+  section.page { margin-bottom:22px; }
+  .page-head { display:flex; align-items:baseline; gap:12px; padding:0 4px 10px; }
+  .page-head .no { font-family:var(--en); font-size:13px; font-weight:800; color:var(--accent); letter-spacing:0.5px; flex:none; }
+  .page-head h2 { font-size:15.5px; font-weight:700; letter-spacing:-0.3px; margin:0; color:var(--ink); flex:1; }
+  .page-head .cnt { font-family:var(--en); font-size:11.5px; font-weight:700; color:var(--dim); flex:none; }
+  .entries { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; }
+  .entry { display:flex; gap:14px; padding:16px 20px; }
+  .entry + .entry { border-top:1px solid var(--line); }
+  .avatar { flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-family:var(--en); font-size:13px; font-weight:800; background:var(--accent-soft); color:var(--accent); }
+  .entry-body { flex:1; min-width:0; }
+  .entry-name { font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .entry-content { font-size:14.5px; line-height:1.6; color:var(--sub); white-space:pre-wrap; word-break:break-word; }
+  footer { text-align:center; font-family:var(--en); font-size:11px; font-weight:700; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase; margin-top:36px; }
 </style>
 </head>
 <body>
-  <h1>피드백 리포트</h1>
-  <div class="meta">총 ${currentItems.length}건 · 생성일 ${escapeHtml(generatedAt)}</div>
+<div class="sheet">
+  <div class="head">
+    <div class="brand"><i></i>SIGNAL PITCH DAY</div>
+    <h1>피드백 리포트</h1>
+    <div class="stats">
+      <div class="stat"><div class="n"><span>${currentItems.length}</span></div><div class="l">전체 피드백</div></div>
+      <div class="stat"><div class="n">${pageLabels.length}</div><div class="l">언급된 페이지</div></div>
+      <div class="stat"><div class="n">${escapeHtml(generatedAt)}</div><div class="l">생성 시각</div></div>
+    </div>
+    <div class="chips">${chips}</div>
+  </div>
   ${sections}
+  <footer>SIGNAL · Feedback Report</footer>
+</div>
 </body>
 </html>`;
 
