@@ -130,6 +130,17 @@
   }
   .list-header h2 { margin: 0; font-size: 16px; }
   .count { color: var(--muted); font-size: 13px; }
+  .export-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .export-btn:hover { background: #f3f4f6; }
   .feedback-item {
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -227,7 +238,10 @@
   <div class="card">
     <div class="list-header">
       <h2>메인 (전체 피드백)</h2>
-      <span class="count" id="feedback-count"></span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="count" id="feedback-count"></span>
+        <button type="button" id="export-btn" class="export-btn">📥 HTML로 내보내기</button>
+      </div>
     </div>
     <div id="feedback-list">
       <div class="empty">불러오는 중...</div>
@@ -256,6 +270,8 @@
   const listEl = document.getElementById('feedback-list');
   const countEl = document.getElementById('feedback-count');
   const pageSelect = document.getElementById('page');
+  const exportBtn = document.getElementById('export-btn');
+  let currentItems = [];
 
   // signal-pitchday.html 의 슬라이드(01~11) 제목
   const PAGES = [
@@ -342,6 +358,7 @@
         items.push(child.val());
       });
       items.reverse(); // 최신순
+      currentItems = items;
 
       countEl.textContent = items.length ? `총 ${items.length}건` : '';
 
@@ -364,6 +381,68 @@
       setStatus('목록을 불러오지 못했습니다: ' + err.message, 'error');
     });
   }
+
+  exportBtn.addEventListener('click', () => {
+    if (!currentItems.length) {
+      alert('내보낼 피드백이 없습니다.');
+      return;
+    }
+
+    const grouped = {};
+    currentItems.forEach((item) => {
+      (grouped[item.page] = grouped[item.page] || []).push(item);
+    });
+    const pageLabels = Object.keys(grouped).sort();
+    const generatedAt = new Date().toLocaleString('ko-KR');
+
+    const sections = pageLabels.map((page) => `
+      <section>
+        <h2>${escapeHtml(page)}</h2>
+        ${grouped[page].map((item) => `
+          <div class="fb-item">
+            <div class="fb-meta">${escapeHtml(item.name)}</div>
+            <div class="fb-content">${escapeHtml(item.content)}</div>
+          </div>
+        `).join('')}
+      </section>
+    `).join('');
+
+    const reportHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>피드백 리포트</title>
+<style>
+  body { margin:0; padding:32px 20px 64px; max-width:720px; margin-left:auto; margin-right:auto;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic",sans-serif;
+    color:#1f2328; background:#f5f6f8; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .meta { color:#6b7280; font-size:13px; margin-bottom:28px; }
+  section { margin-bottom:26px; }
+  h2 { font-size:15px; color:#1f2328; border-bottom:2px solid #2563eb; padding-bottom:8px; margin-bottom:12px; }
+  .fb-item { background:#fff; border:1px solid #e2e4e8; border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+  .fb-meta { font-weight:700; font-size:13px; margin-bottom:6px; }
+  .fb-content { font-size:14px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
+</style>
+</head>
+<body>
+  <h1>피드백 리포트</h1>
+  <div class="meta">총 ${currentItems.length}건 · 생성일 ${escapeHtml(generatedAt)}</div>
+  ${sections}
+</body>
+</html>`;
+
+    const blob = new Blob([reportHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `feedback-report-${new Date().toISOString().slice(0, 10)}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 </script>
 </body>
 </html>
