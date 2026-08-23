@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>피드백 게시판</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card-bg: #ffffff;
+    --border: #e2e4e8;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --danger: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
+  }
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 20px;
+  }
+  .material-link {
+    display: inline-block;
+    margin: 0 0 20px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .material-link:hover { background: #e0e7ff; }
+  details.setup {
+    background: #fff7e6;
+    border: 1px solid #f0d999;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  details.setup summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  details.setup code {
+    background: #00000010;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    font-size: 16px;
+    margin: 0 0 14px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 12px 0 6px;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--text);
+  }
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  button[type="submit"] {
+    margin-top: 16px;
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button[type="submit"]:hover { background: var(--accent-hover); }
+  button[type="submit"]:disabled { background: #9ca3af; cursor: not-allowed; }
+  #status-msg {
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 16px;
+  }
+  #status-msg.error { color: var(--danger); }
+  #status-msg.ok { color: #15803d; }
+  .list-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .list-header h2 { margin: 0; font-size: 16px; }
+  .count { color: var(--muted); font-size: 13px; }
+  .feedback-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .feedback-item .meta {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .feedback-item .name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .feedback-item .page-tag {
+    background: #eef2ff;
+    color: #4338ca;
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .feedback-item .content {
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 24px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>피드백 게시판</h1>
+  <p class="subtitle">이름 / 페이지 / 피드백 내용을 남기면 아래 메인 목록에 모두와 공유됩니다.</p>
+
+  <a href="signal-pitchday.html" target="_blank" rel="noopener" class="material-link">
+    📊 SIGNAL Pitch Day 자료 보기 (새 창)
+  </a>
+
+  <details class="setup">
+    <summary>⚙️ 처음 사용 전 설정 방법 (한 번만)</summary>
+    <p>
+      이 페이지는 <strong>Firebase Realtime Database</strong>를 사용해서, 누가 어떤 기기/브라우저에서
+      제출하든 모든 내용이 한 곳(메인 목록)에 모이도록 만들어졌습니다. 아래 순서대로 한 번만 설정하면 됩니다.
+    </p>
+    <ol>
+      <li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase 콘솔</a>에서 무료 프로젝트를 하나 만듭니다.</li>
+      <li>왼쪽 메뉴에서 <strong>Build → Realtime Database</strong>로 들어가 데이터베이스를 생성합니다 (지역은 아무 곳이나 선택 가능).</li>
+      <li><strong>Rules</strong> 탭에서 아래처럼 설정 후 게시(Publish)합니다. (개인/소규모용 간단 설정이며, 외부에 공개되는 게시판이라면 나중에 더 강화하는 것을 권장합니다.)
+        <pre style="white-space:pre-wrap;background:#00000010;padding:8px;border-radius:6px;">{
+  "rules": {
+    "feedbacks": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}</pre>
+      </li>
+      <li>프로젝트 설정(⚙️) → <strong>일반</strong> 탭 → 하단 "내 앱"에서 웹 앱을 추가하면 <code>firebaseConfig</code> 값이 나옵니다.</li>
+      <li>이 파일 아래쪽 <code>&lt;script&gt;</code> 안의 <code>firebaseConfig</code> 객체를 그 값으로 교체합니다.</li>
+    </ol>
+    <p>설정 전까지는 상단에 "Firebase 설정이 필요합니다" 안내가 표시됩니다.</p>
+  </details>
+
+  <div class="card">
+    <h2>피드백 작성</h2>
+    <form id="feedback-form">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" maxlength="40" required>
+
+      <label for="page">페이지</label>
+      <select id="page" name="page" required>
+        <option value="" disabled selected>페이지를 선택하세요</option>
+      </select>
+
+      <label for="content">피드백 내용</label>
+      <textarea id="content" name="content" maxlength="1000" required></textarea>
+
+      <button type="submit" id="submit-btn">등록</button>
+      <div id="status-msg"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="list-header">
+      <h2>메인 (전체 피드백)</h2>
+      <span class="count" id="feedback-count"></span>
+    </div>
+    <div id="feedback-list">
+      <div class="empty">불러오는 중...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  // TODO: 아래 값을 본인 Firebase 프로젝트의 설정 값으로 교체하세요.
+  // Firebase 콘솔 > 프로젝트 설정 > 일반 > 내 앱 > SDK 설정 및 구성 에서 확인할 수 있습니다.
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const form = document.getElementById('feedback-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const statusMsg = document.getElementById('status-msg');
+  const listEl = document.getElementById('feedback-list');
+  const countEl = document.getElementById('feedback-count');
+  const pageSelect = document.getElementById('page');
+
+  // signal-pitchday.html 의 슬라이드(01~11) 제목
+  const PAGES = [
+    '01 · 법인 고객의 AI, 진짜 문제를 찾았다',
+    '02 · 직원은 이미 쓰는데, 회사는 준비됐을까?',
+    '03 · 현장에서는 무슨 말을 하고 있었을까?',
+    '04 · 같은 말을 들었는데, 왜 답은 여섯 개였을까?',
+    '05 · 루이 교수님은 왜 답을 묻지 않았을까?',
+    '06 · 고객의 말을 우리의 경험으로 해석하는 것',
+    '07 · 고객의 이야기를 다시 들으니, 무엇이 보였을까?',
+    '08 · 진짜 의도 셋을, 그대로 세 가지로 만들었습니다',
+    '09 · 만들어서 다시 물었더니, 답이 달라졌습니다',
+    '10 · 지금은 어디까지 왔을까?',
+    '11 · 우리가 찾은 건 답이 아니라, 고객을 듣는 방법이었습니다'
+  ];
+  PAGES.forEach((label, i) => {
+    const opt = document.createElement('option');
+    opt.value = label;
+    opt.textContent = label;
+    pageSelect.appendChild(opt);
+  });
+  const preselect = new URLSearchParams(location.search).get('page');
+  if (preselect) {
+    const match = PAGES.find((label) => label.startsWith(String(preselect).padStart(2, '0') + ' '));
+    if (match) pageSelect.value = match;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
+  function setStatus(text, type) {
+    statusMsg.textContent = text;
+    statusMsg.className = type || '';
+  }
+
+  const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && !!firebaseConfig.databaseURL;
+
+  if (!isConfigured) {
+    setStatus('⚠️ Firebase 설정이 필요합니다. 상단 "처음 사용 전 설정 방법"을 확인해 주세요.', 'error');
+    submitBtn.disabled = true;
+    listEl.innerHTML = '<div class="empty">Firebase 설정 후 이용할 수 있습니다.</div>';
+  } else {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const feedbackRef = db.ref('feedbacks');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = form.name.value.trim();
+      const page = form.page.value.trim();
+      const content = form.content.value.trim();
+
+      if (!name || !page || !content) {
+        setStatus('모든 항목을 입력해 주세요.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      setStatus('등록 중...', '');
+
+      feedbackRef.push({
+        name,
+        page,
+        content,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        form.reset();
+        setStatus('등록되었습니다. 메인 목록에서 확인하세요.', 'ok');
+      }).catch((err) => {
+        console.error(err);
+        setStatus('등록에 실패했습니다: ' + err.message, 'error');
+      }).finally(() => {
+        submitBtn.disabled = false;
+      });
+    });
+
+    feedbackRef.orderByChild('createdAt').on('value', (snapshot) => {
+      const items = [];
+      snapshot.forEach((child) => {
+        items.push(child.val());
+      });
+      items.reverse(); // 최신순
+
+      countEl.textContent = items.length ? `총 ${items.length}건` : '';
+
+      if (!items.length) {
+        listEl.innerHTML = '<div class="empty">아직 등록된 피드백이 없습니다.</div>';
+        return;
+      }
+
+      listEl.innerHTML = items.map((item) => `
+        <div class="feedback-item">
+          <div class="meta">
+            <span class="name">${escapeHtml(item.name)}</span>
+            <span class="page-tag">p.${escapeHtml(item.page)}</span>
+          </div>
+          <div class="content">${escapeHtml(item.content)}</div>
+        </div>
+      `).join('');
+    }, (err) => {
+      console.error(err);
+      setStatus('목록을 불러오지 못했습니다: ' + err.message, 'error');
+    });
+  }
+</script>
+</body>
+</html>
