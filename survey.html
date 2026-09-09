@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고객 설문지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f7f5;
+    --surface: #ffffff;
+    --surface-alt: #eef1ee;
+    --ink: #15191a;
+    --sub: #5c655f;
+    --dim: #8b948d;
+    --line: #e1e5e0;
+    --accent: #189c47;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3f5ea;
+    --danger: #c0392b;
+    --warn-bg: #fdf6e3;
+    --warn-line: #e8d9a0;
+    --shadow: 0 1px 2px rgba(20,30,20,.05), 0 8px 24px rgba(20,30,20,.07);
+    --en: 'Manrope', 'Pretendard Variable', sans-serif;
+    --kr: 'Noto Sans KR', 'Pretendard Variable', 'Malgun Gothic', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121212;
+      --surface: #181818;
+      --surface-alt: #1f1f1f;
+      --ink: #ffffff;
+      --sub: #bdbdbd;
+      --dim: #8e8e8e;
+      --line: #2c2f2c;
+      --accent: #1ed760;
+      --accent-ink: #0d0d0d;
+      --accent-soft: rgba(30,215,96,.14);
+      --danger: #f3727f;
+      --warn-bg: rgba(255,196,64,.08);
+      --warn-line: rgba(255,196,64,.28);
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 16px 96px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--kr);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  .brand {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--en); font-size: 11px; font-weight: 800; letter-spacing: 3px;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 14px;
+  }
+  .brand i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: block; }
+  h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.6px; margin: 0 0 6px; }
+  .subtitle { color: var(--sub); font-size: 14px; line-height: 1.6; margin: 0 0 24px; }
+
+  details.setup {
+    background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 12px;
+    padding: 14px 18px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--ink);
+  }
+  details.setup summary { cursor: pointer; font-weight: 700; }
+  details.setup code { background: rgba(0,0,0,.08); padding: 1px 5px; border-radius: 4px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    padding: 26px 24px; box-shadow: var(--shadow);
+  }
+  .q { margin-bottom: 26px; }
+  .q:last-child { margin-bottom: 0; }
+  .q .qn {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;
+  }
+  .q .qn b {
+    font-family: var(--en); font-size: 11.5px; font-weight: 800; color: var(--accent);
+    flex: none;
+  }
+  .q .qn span { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+  .q .qn em {
+    font-style: normal; font-size: 11px; font-weight: 700; color: var(--dim);
+    background: var(--surface-alt); border-radius: 6px; padding: 1px 7px; margin-left: auto; flex: none;
+  }
+  .q .qn em.required { color: var(--danger); background: transparent; padding: 0; margin-left: 6px; }
+
+  input[type="text"], textarea {
+    width: 100%; padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px;
+    font-size: 14px; font-family: var(--kr); background: var(--paper); color: var(--ink);
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+  .scale { display: flex; gap: 8px; }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale label {
+    flex: 1; text-align: center; padding: 10px 0; border: 1px solid var(--line); border-radius: 10px;
+    font-family: var(--en); font-size: 14px; font-weight: 800; color: var(--sub); cursor: pointer;
+    background: var(--paper);
+  }
+  .scale input:checked + label { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .scale-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11.5px; color: var(--dim); }
+
+  button.submit {
+    margin-top: 24px; width: 100%; padding: 14px; border: none; border-radius: 10px;
+    background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 800; cursor: pointer;
+  }
+  button.submit:disabled { background: var(--dim); cursor: not-allowed; }
+  #status-msg { font-size: 13px; margin-top: 10px; min-height: 16px; }
+  #status-msg.error { color: var(--danger); }
+
+  #thanks { display: none; text-align: center; padding: 20px 4px; }
+  #thanks .mark {
+    width: 52px; height: 52px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; margin: 0 auto 18px; font-size: 24px;
+  }
+  #thanks h2 { font-size: 19px; font-weight: 900; margin: 0 0 8px; }
+  #thanks p { color: var(--sub); font-size: 14px; line-height: 1.6; margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><i></i>CUSTOMER SURVEY</div>
+  <h1>고객 설문지</h1>
+  <p class="subtitle">더 나은 서비스를 위해 소중한 의견을 들려주세요. 응답에는 약 2분 정도 소요됩니다.</p>
+
+  <details class="setup">
+    <summary>⚙️ 처음 사용 전 설정 방법 (한 번만)</summary>
+    <p>
+      이 설문지는 기존 피드백 게시판과 같은 <strong>Firebase Realtime Database</strong>를 그대로 사용합니다
+      (같은 프로젝트, <code>surveys</code>라는 별도 경로에 저장). 아래 규칙만 한 번 추가해 주세요.
+    </p>
+    <p>Firebase 콘솔 → Realtime Database → <strong>Rules</strong> 탭에서 <code>surveys</code> 항목을 아래처럼 추가하고 게시(Publish)합니다.</p>
+    <pre style="white-space:pre-wrap;background:rgba(0,0,0,.08);padding:8px;border-radius:6px;">{
+  "rules": {
+    "feedbacks": { ".read": true, ".write": true },
+    "surveys": { ".read": true, ".write": true }
+  }
+}</pre>
+  </details>
+
+  <form id="survey-form" class="card">
+    <div class="q">
+      <div class="qn"><b>01</b><span>이름</span><em class="required">필수</em></div>
+      <input type="text" id="q1" maxlength="40" required>
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>02</b><span>연락처 (이메일 또는 전화번호)</span><em class="required">필수</em></div>
+      <input type="text" id="q2" maxlength="60" required>
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>03</b><span>소속 / 직무</span><em>선택</em></div>
+      <input type="text" id="q3" maxlength="60">
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>04</b><span>전반적인 만족도</span><em class="required">필수</em></div>
+      <div class="scale" data-q="q4">
+        <input type="radio" name="q4" value="1" id="q4-1"><label for="q4-1">1</label>
+        <input type="radio" name="q4" value="2" id="q4-2"><label for="q4-2">2</label>
+        <input type="radio" name="q4" value="3" id="q4-3"><label for="q4-3">3</label>
+        <input type="radio" name="q4" value="4" id="q4-4"><label for="q4-4">4</label>
+        <input type="radio" name="q4" value="5" id="q4-5"><label for="q4-5">5</label>
+      </div>
+      <div class="scale-labels"><span>매우 불만족</span><span>매우 만족</span></div>
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>05</b><span>상담 / 응대 친절도</span><em class="required">필수</em></div>
+      <div class="scale" data-q="q5">
+        <input type="radio" name="q5" value="1" id="q5-1"><label for="q5-1">1</label>
+        <input type="radio" name="q5" value="2" id="q5-2"><label for="q5-2">2</label>
+        <input type="radio" name="q5" value="3" id="q5-3"><label for="q5-3">3</label>
+        <input type="radio" name="q5" value="4" id="q5-4"><label for="q5-4">4</label>
+        <input type="radio" name="q5" value="5" id="q5-5"><label for="q5-5">5</label>
+      </div>
+      <div class="scale-labels"><span>매우 불만족</span><span>매우 만족</span></div>
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>06</b><span>재이용 / 재구매 의향</span><em class="required">필수</em></div>
+      <div class="scale" data-q="q6">
+        <input type="radio" name="q6" value="1" id="q6-1"><label for="q6-1">1</label>
+        <input type="radio" name="q6" value="2" id="q6-2"><label for="q6-2">2</label>
+        <input type="radio" name="q6" value="3" id="q6-3"><label for="q6-3">3</label>
+        <input type="radio" name="q6" value="4" id="q6-4"><label for="q6-4">4</label>
+        <input type="radio" name="q6" value="5" id="q6-5"><label for="q6-5">5</label>
+      </div>
+      <div class="scale-labels"><span>전혀 없음</span><span>매우 높음</span></div>
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>07</b><span>가장 만족스러웠던 점 <em style="margin-left:6px;font-size:11px;color:var(--dim);background:var(--surface-alt);border-radius:6px;padding:1px 7px;">주관식</em></span></div>
+      <textarea id="q7" maxlength="500" placeholder="자유롭게 적어주세요"></textarea>
+    </div>
+
+    <div class="q">
+      <div class="qn"><b>08</b><span>개선이 필요하다고 느낀 점 <em style="margin-left:6px;font-size:11px;color:var(--dim);background:var(--surface-alt);border-radius:6px;padding:1px 7px;">주관식</em></span></div>
+      <textarea id="q8" maxlength="500" placeholder="자유롭게 적어주세요"></textarea>
+    </div>
+
+    <button type="submit" class="submit" id="submit-btn">제출하기</button>
+    <div id="status-msg"></div>
+  </form>
+
+  <div id="thanks" class="card">
+    <div class="mark">✓</div>
+    <h2>응답이 제출되었습니다</h2>
+    <p>소중한 의견 감사합니다. 서비스 개선에 반영하겠습니다.</p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCRkZIjcL__dgSbFE90NqHySIMy-6uCWhg",
+    authDomain: "reveiw-4021d.firebaseapp.com",
+    databaseURL: "https://reveiw-4021d-default-rtdb.firebaseio.com",
+    projectId: "reveiw-4021d",
+    storageBucket: "reveiw-4021d.firebasestorage.app",
+    messagingSenderId: "112787471912",
+    appId: "1:112787471912:web:f0a0de19ac8d7309cdff1d",
+    measurementId: "G-5942BZTMKP"
+  };
+
+  const form = document.getElementById('survey-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const statusMsg = document.getElementById('status-msg');
+  const thanks = document.getElementById('thanks');
+
+  function setStatus(text, type) {
+    statusMsg.textContent = text;
+    statusMsg.className = type || '';
+  }
+
+  const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && !!firebaseConfig.databaseURL;
+
+  if (!isConfigured) {
+    setStatus('⚠️ Firebase 설정이 필요합니다. 상단 "처음 사용 전 설정 방법"을 확인해 주세요.', 'error');
+    submitBtn.disabled = true;
+  } else {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const surveyRef = db.ref('surveys');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const q4 = form.querySelector('input[name="q4"]:checked');
+      const q5 = form.querySelector('input[name="q5"]:checked');
+      const q6 = form.querySelector('input[name="q6"]:checked');
+
+      if (!q4 || !q5 || !q6) {
+        setStatus('필수 항목(만족도, 친절도, 재이용 의향)을 모두 선택해 주세요.', 'error');
+        return;
+      }
+
+      const answers = {
+        name: form.q1.value.trim(),
+        contact: form.q2.value.trim(),
+        org: form.q3.value.trim(),
+        satisfaction: Number(q4.value),
+        courtesy: Number(q5.value),
+        revisit: Number(q6.value),
+        best: form.q7.value.trim(),
+        improve: form.q8.value.trim(),
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      };
+
+      if (!answers.name || !answers.contact) {
+        setStatus('이름과 연락처를 입력해 주세요.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      setStatus('제출 중...', '');
+
+      surveyRef.push(answers).then(() => {
+        form.style.display = 'none';
+        thanks.style.display = 'block';
+      }).catch((err) => {
+        console.error(err);
+        setStatus('제출에 실패했습니다: ' + err.message, 'error');
+        submitBtn.disabled = false;
+      });
+    });
+  }
+</script>
+</body>
+</html>
