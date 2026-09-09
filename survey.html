@@ -22,8 +22,13 @@ h1{margin:18px 0 14px;font-size:clamp(34px,6vw,66px);line-height:1.02;letter-spa
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(40,20,35,.05)}
 .card .num{font-size:13px;color:var(--uplus);font-weight:900}.card h3{margin:7px 0 8px;font-size:20px}.card p{margin:0;color:#52525b;font-size:14px}
-.callout{background:var(--pink);border:1px solid #f5c8df;border-left:5px solid var(--uplus);border-radius:16px;padding:18px 20px;margin:14px 0}
-.callout summary{cursor:pointer;font-weight:800}
+.admin-setup{margin:40px 0 0;text-align:center}
+.admin-setup summary{display:inline-block;cursor:pointer;font-size:12px;color:var(--muted);list-style:none}
+.admin-setup summary::-webkit-details-marker{display:none}
+.admin-setup summary:hover{color:var(--uplus)}
+.admin-setup[open] summary{color:var(--uplus)}
+.admin-setup .body{text-align:left;max-width:520px;margin:10px auto 0;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:12.5px;color:var(--muted)}
+.admin-setup .body pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);padding:10px;border-radius:10px;font-size:12px;margin-top:8px}
 .compare{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}.compare th,.compare td{padding:14px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top;text-align:left}.compare th:last-child,.compare td:last-child{border-right:0}.compare tr:last-child td{border-bottom:0}.compare thead th{background:#29272d;color:#fff}.compare thead th:last-child{background:var(--uplus)}.compare td:first-child{font-weight:800;width:18%}.strong{color:var(--uplus);font-weight:900}
 .plan-wrap{overflow-x:auto}.plans{width:100%;border-collapse:collapse;min-width:760px;background:#fff;border-radius:18px;overflow:hidden}.plans th,.plans td{padding:12px 13px;border:1px solid var(--line);text-align:center;font-size:13px}.plans th{background:#29272d;color:#fff}.plans .biz{background:#fff2f8}.plans .light{background:#f5f4ff}.plans td:first-child,.plans td:nth-child(2){font-weight:800}.note{font-size:12px;color:var(--muted);margin-top:10px}
 .feature-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.feature{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px}.feature b{display:block;color:var(--purple);margin-bottom:4px}.feature span{font-size:13px;color:#555}
@@ -59,21 +64,6 @@ textarea,input[type=text]{width:calc(100% - 46px);margin-left:46px;margin-top:9p
 <section class="section" id="survey">
   <div class="section-head"><h2>설문 문항</h2><p>총 8문항 · 선택형 및 의견형</p></div>
   <div class="form-intro"><h3>응답 안내</h3><p>앞서 설명드린 기업용 AI Agent 상품 구조, 요금제 및 주요 기능을 기준으로 실제 고객 접점 경험과 영업 관점의 의견을 작성해 주세요.</p></div>
-
-  <details class="callout" id="setup-callout">
-    <summary>⚙️ 관리자용 — 처음 사용 전 설정 방법 (한 번만)</summary>
-    <p style="margin:10px 0 0">
-      이 설문은 <strong>Firebase Realtime Database</strong>에 응답을 저장해서, 영업사원이 어느 기기에서
-      제출하든 한 곳(관리자용 결과 페이지)에 모이도록 되어 있습니다. Firebase Rules에 <code>surveys</code>
-      경로가 아직 없다면 아래처럼 추가하고 게시(Publish)해 주세요.
-    </p>
-    <pre style="white-space:pre-wrap;background:var(--soft);padding:12px;border-radius:12px;font-size:13px;margin-top:10px">{
-  "rules": {
-    "feedbacks": { ".read": true, ".write": true },
-    "surveys": { ".read": true, ".write": true }
-  }
-}</pre>
-  </details>
 
   <form id="surveyForm">
     <div class="respondent">
@@ -121,6 +111,24 @@ textarea,input[type=text]{width:calc(100% - 46px);margin-left:46px;margin-top:9p
     <div id="save-status"></div>
   </form>
   <div class="result" id="result"><h3>응답 요약</h3><pre id="summary"></pre><button class="btn secondary" onclick="copySummary()">요약 복사</button></div>
+
+  <details class="admin-setup">
+    <summary>⚙️</summary>
+    <div class="body">
+      <strong>관리자용 — 처음 사용 전 설정 방법 (한 번만)</strong>
+      <p style="margin:8px 0 0">
+        이 설문은 Firebase Realtime Database에 응답을 저장해서, 영업사원이 어느 기기에서
+        제출하든 한 곳(관리자용 결과 페이지)에 모이도록 되어 있습니다. Firebase Rules에 <code>surveys</code>
+        경로가 아직 없다면 아래처럼 추가하고 게시(Publish)해 주세요.
+      </p>
+      <pre>{
+  "rules": {
+    "feedbacks": { ".read": true, ".write": true },
+    "surveys": { ".read": true, ".write": true }
+  }
+}</pre>
+    </div>
+  </details>
 </section>
 </main>
 
