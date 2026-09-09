@@ -38,8 +38,11 @@ h1{margin:0 0 6px;font-size:28px;letter-spacing:-.04em}
 
 .entries{display:flex;flex-direction:column;gap:10px}
 .entry{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
-.entry-top{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
-.entry-time{font-size:12px;color:var(--muted)}
+.entry-top{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.entry-name{font-size:14.5px;font-weight:700}
+.entry-org{font-size:12px;color:var(--muted);background:var(--soft);border-radius:6px;padding:1px 8px}
+.entry-contact{font-size:12px;color:var(--muted)}
+.entry-time{font-size:12px;color:var(--muted);margin-left:auto}
 .entry-actions{margin-left:auto}
 .entry-actions button{border:1px solid var(--line);background:transparent;border-radius:6px;padding:3px 9px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--muted)}
 .entry-actions button:hover{color:#c0392b;border-color:#c0392b}
@@ -152,6 +155,9 @@ function renderEntries(items) {
   entryList.innerHTML = `<div class="entries">${items.map((item) => `
     <div class="entry">
       <div class="entry-top">
+        <span class="entry-name">${escapeHtml(item.respName || '(이름 없음)')}</span>
+        ${item.respOrg ? `<span class="entry-org">${escapeHtml(item.respOrg)}</span>` : ''}
+        <span class="entry-contact">${escapeHtml(item.respContact || '')}</span>
         <span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span>
         <span class="entry-actions"><button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button></span>
       </div>
@@ -229,7 +235,12 @@ exportBtn.addEventListener('click', () => {
 
   const entriesHtml = currentItems.map((item) => `
     <div class="entry">
-      <div class="entry-top"><span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span></div>
+      <div class="entry-top">
+        <span class="entry-name">${escapeHtml(item.respName || '(이름 없음)')}</span>
+        ${item.respOrg ? `<span class="entry-org">${escapeHtml(item.respOrg)}</span>` : ''}
+        <span class="entry-contact">${escapeHtml(item.respContact || '')}</span>
+        <span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span>
+      </div>
       <div class="answer"><div class="l">1. AI 관련 고객 문의 경험</div><div class="v">${escapeHtml(item.q1 || '미응답')}</div></div>
       <div class="answer"><div class="l">2. 수요 예상 고객</div><div class="v">${escapeHtml((item.q2 || []).join(', ') || '미선택')}</div></div>
       <div class="answer"><div class="l">3. 핵심 고객가치</div><div class="v">${escapeHtml((item.q3 || []).join(', ') || '미선택')}</div></div>
@@ -263,7 +274,10 @@ exportBtn.addEventListener('click', () => {
   .bar-fill{height:100%;background:var(--uplus);border-radius:999px}
   .bar-count{width:30px;flex:none;text-align:right;font-size:12px;font-weight:800;color:var(--uplus)}
   .entry{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:10px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
-  .entry-top{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+  .entry-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:10px}
+  .entry-name{font-size:13.5px;font-weight:700;color:var(--ink)}
+  .entry-org{background:var(--soft);border-radius:6px;padding:1px 7px}
+  .entry-time{margin-left:auto}
   .answer{margin-bottom:8px}
   .answer .l{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px}
   .answer .v{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
