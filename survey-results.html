@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설문 응답 결과</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f7f5; --surface: #ffffff; --surface-alt: #eef1ee;
+    --ink: #15191a; --sub: #5c655f; --dim: #8b948d; --line: #e1e5e0;
+    --accent: #189c47; --accent-ink: #ffffff; --accent-soft: #e3f5ea;
+    --danger: #c0392b;
+    --shadow: 0 1px 2px rgba(20,30,20,.05), 0 8px 24px rgba(20,30,20,.07);
+    --en: 'Manrope', 'Pretendard Variable', sans-serif;
+    --kr: 'Noto Sans KR', 'Pretendard Variable', 'Malgun Gothic', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121212; --surface: #181818; --surface-alt: #1f1f1f;
+      --ink: #ffffff; --sub: #bdbdbd; --dim: #8e8e8e; --line: #2c2f2c;
+      --accent: #1ed760; --accent-ink: #0d0d0d; --accent-soft: rgba(30,215,96,.14);
+      --danger: #f3727f;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:40px 16px 96px; background:var(--paper); color:var(--ink); font-family:var(--kr); }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  .brand { display:flex; align-items:center; gap:8px; font-family:var(--en); font-size:11px; font-weight:800; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
+  .brand i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:block; }
+  h1 { font-size:24px; font-weight:900; letter-spacing:-0.6px; margin:0 0 6px; }
+  .subtitle { color:var(--sub); font-size:14px; margin:0 0 24px; }
+
+  .stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+  .stat { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow); }
+  .stat .n { font-family:var(--en); font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--accent); }
+  .stat .l { font-size:12px; color:var(--sub); font-weight:600; margin-top:2px; }
+
+  .toolbar { display:flex; align-items:center; justify-content:flex-end; margin-bottom:14px; }
+  .export-btn { font-family:var(--en); font-size:11.5px; font-weight:800; color:var(--sub); background:var(--surface-alt); border:1px solid var(--line); border-radius:999px; padding:6px 13px; cursor:pointer; }
+  .export-btn:hover { background:var(--accent-soft); color:var(--accent); }
+
+  .entries { display:flex; flex-direction:column; gap:10px; }
+  .entry { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
+  .entry-top { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .entry-name { font-size:14.5px; font-weight:700; }
+  .entry-contact { font-family:var(--en); font-size:12px; color:var(--dim); }
+  .entry-org { font-size:12px; color:var(--dim); background:var(--surface-alt); border-radius:6px; padding:1px 8px; }
+  .entry-time { margin-left:auto; font-family:var(--en); font-size:11px; color:var(--dim); }
+
+  .scores { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .score { background:var(--accent-soft); color:var(--accent); border-radius:8px; padding:6px 12px; font-size:12.5px; font-weight:700; }
+  .score b { font-family:var(--en); font-size:14px; margin-left:3px; }
+
+  .answer { margin-bottom:10px; }
+  .answer:last-child { margin-bottom:0; }
+  .answer .l { font-size:11.5px; font-weight:700; color:var(--dim); margin-bottom:3px; }
+  .answer .v { font-size:13.5px; line-height:1.55; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+
+  .entry-actions { display:flex; gap:8px; margin-top:12px; }
+  .entry-actions button { border:1px solid var(--line); background:transparent; border-radius:6px; padding:3px 9px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--dim); }
+  .entry-actions button:hover { color:var(--danger); border-color:var(--danger); }
+
+  .empty { color:var(--dim); font-size:14px; text-align:center; padding:40px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><i></i>CUSTOMER SURVEY</div>
+  <h1>설문 응답 결과</h1>
+  <p class="subtitle">제출된 응답을 모아 보는 관리자용 페이지입니다. 응답자에게는 공유하지 마세요.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="stat-count">-</div><div class="l">전체 응답</div></div>
+    <div class="stat"><div class="n" id="stat-satisfaction">-</div><div class="l">평균 만족도</div></div>
+    <div class="stat"><div class="n" id="stat-courtesy">-</div><div class="l">평균 친절도</div></div>
+    <div class="stat"><div class="n" id="stat-revisit">-</div><div class="l">평균 재이용 의향</div></div>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" class="export-btn" id="export-btn">📥 HTML로 내보내기</button>
+  </div>
+
+  <div id="list"><div class="empty">불러오는 중...</div></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCRkZIjcL__dgSbFE90NqHySIMy-6uCWhg",
+    authDomain: "reveiw-4021d.firebaseapp.com",
+    databaseURL: "https://reveiw-4021d-default-rtdb.firebaseio.com",
+    projectId: "reveiw-4021d",
+    storageBucket: "reveiw-4021d.firebasestorage.app",
+    messagingSenderId: "112787471912",
+    appId: "1:112787471912:web:f0a0de19ac8d7309cdff1d",
+    measurementId: "G-5942BZTMKP"
+  };
+
+  const listEl = document.getElementById('list');
+  const exportBtn = document.getElementById('export-btn');
+  const statCount = document.getElementById('stat-count');
+  const statSatisfaction = document.getElementById('stat-satisfaction');
+  const statCourtesy = document.getElementById('stat-courtesy');
+  const statRevisit = document.getElementById('stat-revisit');
+  let currentItems = [];
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
+  function avg(items, key) {
+    if (!items.length) return '-';
+    const sum = items.reduce((s, i) => s + (Number(i[key]) || 0), 0);
+    return (sum / items.length).toFixed(1);
+  }
+
+  const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && !!firebaseConfig.databaseURL;
+
+  if (!isConfigured) {
+    listEl.innerHTML = '<div class="empty">⚠️ Firebase 설정이 필요합니다. survey.html의 안내를 확인해 주세요.</div>';
+    exportBtn.disabled = true;
+  } else {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const surveyRef = db.ref('surveys');
+
+    surveyRef.orderByChild('createdAt').on('value', (snapshot) => {
+      const items = [];
+      snapshot.forEach((child) => {
+        items.push({ key: child.key, ...child.val() });
+      });
+      items.reverse();
+      currentItems = items;
+
+      statCount.textContent = items.length;
+      statSatisfaction.textContent = avg(items, 'satisfaction');
+      statCourtesy.textContent = avg(items, 'courtesy');
+      statRevisit.textContent = avg(items, 'revisit');
+
+      if (!items.length) {
+        listEl.innerHTML = '<div class="empty">아직 제출된 응답이 없습니다.</div>';
+        return;
+      }
+
+      listEl.innerHTML = `<div class="entries">${items.map((item) => `
+        <div class="entry">
+          <div class="entry-top">
+            <span class="entry-name">${escapeHtml(item.name || '(이름 없음)')}</span>
+            <span class="entry-contact">${escapeHtml(item.contact || '')}</span>
+            ${item.org ? `<span class="entry-org">${escapeHtml(item.org)}</span>` : ''}
+            <span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span>
+          </div>
+          <div class="scores">
+            <span class="score">만족도<b>${escapeHtml(item.satisfaction ?? '-')}</b></span>
+            <span class="score">친절도<b>${escapeHtml(item.courtesy ?? '-')}</b></span>
+            <span class="score">재이용 의향<b>${escapeHtml(item.revisit ?? '-')}</b></span>
+          </div>
+          ${item.best ? `<div class="answer"><div class="l">가장 만족스러웠던 점</div><div class="v">${escapeHtml(item.best)}</div></div>` : ''}
+          ${item.improve ? `<div class="answer"><div class="l">개선이 필요한 점</div><div class="v">${escapeHtml(item.improve)}</div></div>` : ''}
+          <div class="entry-actions">
+            <button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button>
+          </div>
+        </div>
+      `).join('')}</div>`;
+    }, (err) => {
+      console.error(err);
+      listEl.innerHTML = '<div class="empty">목록을 불러오지 못했습니다: ' + escapeHtml(err.message) + '</div>';
+    });
+
+    listEl.addEventListener('click', (e) => {
+      const deleteBtn = e.target.closest('.delete-btn');
+      if (!deleteBtn) return;
+      const item = currentItems.find((i) => i.key === deleteBtn.dataset.key);
+      if (!item) return;
+      const ok = confirm(`"${item.name}"님의 응답을 삭제할까요?`);
+      if (!ok) return;
+      surveyRef.child(item.key).remove().catch((err) => {
+        alert('삭제에 실패했습니다: ' + err.message);
+      });
+    });
+  }
+
+  exportBtn.addEventListener('click', () => {
+    if (!currentItems.length) {
+      alert('내보낼 응답이 없습니다.');
+      return;
+    }
+
+    const generatedAt = new Date().toLocaleString('ko-KR');
+    const rows = currentItems.map((item) => `
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-name">${escapeHtml(item.name || '(이름 없음)')}</span>
+          <span class="entry-contact">${escapeHtml(item.contact || '')}</span>
+          ${item.org ? `<span class="entry-org">${escapeHtml(item.org)}</span>` : ''}
+        </div>
+        <div class="scores">
+          <span class="score">만족도<b>${escapeHtml(item.satisfaction ?? '-')}</b></span>
+          <span class="score">친절도<b>${escapeHtml(item.courtesy ?? '-')}</b></span>
+          <span class="score">재이용 의향<b>${escapeHtml(item.revisit ?? '-')}</b></span>
+        </div>
+        ${item.best ? `<div class="answer"><div class="l">가장 만족스러웠던 점</div><div class="v">${escapeHtml(item.best)}</div></div>` : ''}
+        ${item.improve ? `<div class="answer"><div class="l">개선이 필요한 점</div><div class="v">${escapeHtml(item.improve)}</div></div>` : ''}
+      </div>
+    `).join('');
+
+    const reportHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설문 응답 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f6f7f5; --surface:#fff; --surface-alt:#eef1ee; --ink:#15191a; --sub:#5c655f; --dim:#8b948d; --line:#e1e5e0; --accent:#189c47; --accent-soft:#e3f5ea; --shadow:0 1px 2px rgba(20,30,20,.05),0 8px 24px rgba(20,30,20,.07); --en:'Manrope',sans-serif; --kr:'Noto Sans KR',sans-serif; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#121212; --surface:#181818; --surface-alt:#1f1f1f; --ink:#fff; --sub:#bdbdbd; --dim:#8e8e8e; --line:#2c2f2c; --accent:#1ed760; --accent-soft:rgba(30,215,96,.14); --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.5); } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:48px 20px 96px; max-width:720px; margin-left:auto; margin-right:auto; background:var(--paper); color:var(--ink); font-family:var(--kr); }
+  .head { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:28px 30px; box-shadow:var(--shadow); margin-bottom:24px; }
+  .head .brand { display:flex; align-items:center; gap:8px; font-family:var(--en); font-size:11px; font-weight:800; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
+  .head .brand i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:block; }
+  .head h1 { font-size:22px; font-weight:900; margin:0 0 6px; }
+  .head .meta { color:var(--sub); font-size:13px; }
+  .entries { display:flex; flex-direction:column; gap:10px; }
+  .entry { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
+  .entry-top { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .entry-name { font-size:14.5px; font-weight:700; }
+  .entry-contact { font-family:var(--en); font-size:12px; color:var(--dim); }
+  .entry-org { font-size:12px; color:var(--dim); background:var(--surface-alt); border-radius:6px; padding:1px 8px; }
+  .scores { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .score { background:var(--accent-soft); color:var(--accent); border-radius:8px; padding:6px 12px; font-size:12.5px; font-weight:700; }
+  .score b { font-family:var(--en); font-size:14px; margin-left:3px; }
+  .answer { margin-bottom:10px; }
+  .answer .l { font-size:11.5px; font-weight:700; color:var(--dim); margin-bottom:3px; }
+  .answer .v { font-size:13.5px; line-height:1.55; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand"><i></i>CUSTOMER SURVEY</div>
+    <h1>설문 응답 리포트</h1>
+    <div class="meta">총 ${currentItems.length}건 · 생성일 ${escapeHtml(generatedAt)}</div>
+  </div>
+  <div class="entries">${rows}</div>
+</body>
+</html>`;
+
+    const blob = new Blob([reportHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `survey-report-${new Date().toISOString().slice(0, 10)}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>
