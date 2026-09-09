@@ -208,6 +208,7 @@ form.addEventListener('submit',e=>{e.preventDefault();
  surveyRef.push(answers).then(() => {
    saveStatus.textContent = '✓ 응답이 저장되었습니다.';
    saveStatus.className = 'ok';
+   alert('제출되었습니다. 소중한 의견 감사합니다!');
  }).catch((err) => {
    console.error(err);
    saveStatus.textContent = '저장에 실패했습니다: ' + err.message;
