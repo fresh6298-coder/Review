@@ -3,267 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>설문 응답 결과</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<title>영업현장 설문 결과</title>
 <style>
-  :root {
-    --paper: #f6f7f5; --surface: #ffffff; --surface-alt: #eef1ee;
-    --ink: #15191a; --sub: #5c655f; --dim: #8b948d; --line: #e1e5e0;
-    --accent: #189c47; --accent-ink: #ffffff; --accent-soft: #e3f5ea;
-    --danger: #c0392b;
-    --shadow: 0 1px 2px rgba(20,30,20,.05), 0 8px 24px rgba(20,30,20,.07);
-    --en: 'Manrope', 'Pretendard Variable', sans-serif;
-    --kr: 'Noto Sans KR', 'Pretendard Variable', 'Malgun Gothic', sans-serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #121212; --surface: #181818; --surface-alt: #1f1f1f;
-      --ink: #ffffff; --sub: #bdbdbd; --dim: #8e8e8e; --line: #2c2f2c;
-      --accent: #1ed760; --accent-ink: #0d0d0d; --accent-soft: rgba(30,215,96,.14);
-      --danger: #f3727f;
-      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.5);
-    }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; padding:40px 16px 96px; background:var(--paper); color:var(--ink); font-family:var(--kr); }
-  .wrap { max-width: 720px; margin: 0 auto; }
-  .brand { display:flex; align-items:center; gap:8px; font-family:var(--en); font-size:11px; font-weight:800; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
-  .brand i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:block; }
-  h1 { font-size:24px; font-weight:900; letter-spacing:-0.6px; margin:0 0 6px; }
-  .subtitle { color:var(--sub); font-size:14px; margin:0 0 24px; }
+:root{
+  --uplus:#e6007e; --ink:#17171c; --muted:#6b6b73;
+  --line:#e6e6eb; --soft:#f7f7f9; --pink:#fff3f9; --green:#14804a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f4f7;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;line-height:1.58;letter-spacing:-.02em}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1000px;margin:auto;padding:13px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{font-weight:900;color:var(--uplus);font-size:20px}.security{font-size:12px;color:var(--muted)}
+.wrap{max-width:1000px;margin:auto;padding:30px 22px 80px}
+h1{margin:0 0 6px;font-size:28px;letter-spacing:-.04em}
+.subtitle{color:var(--muted);font-size:14px;margin:0 0 22px}
 
-  .stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
-  .stat { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow); }
-  .stat .n { font-family:var(--en); font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--accent); }
-  .stat .l { font-size:12px; color:var(--sub); font-weight:600; margin-top:2px; }
+.stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.stat{flex:1;min-width:140px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
+.stat .n{font-size:26px;font-weight:900;color:var(--uplus)}
+.stat .l{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px}
 
-  .toolbar { display:flex; align-items:center; justify-content:flex-end; margin-bottom:14px; }
-  .export-btn { font-family:var(--en); font-size:11.5px; font-weight:800; color:var(--sub); background:var(--surface-alt); border:1px solid var(--line); border-radius:999px; padding:6px 13px; cursor:pointer; }
-  .export-btn:hover { background:var(--accent-soft); color:var(--accent); }
+.toolbar{display:flex;justify-content:flex-end;margin-bottom:16px}
+.export-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:800;color:var(--ink);cursor:pointer}
+.export-btn:hover{background:var(--pink);border-color:#f5c8df;color:var(--uplus)}
 
-  .entries { display:flex; flex-direction:column; gap:10px; }
-  .entry { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
-  .entry-top { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-  .entry-name { font-size:14.5px; font-weight:700; }
-  .entry-contact { font-family:var(--en); font-size:12px; color:var(--dim); }
-  .entry-org { font-size:12px; color:var(--dim); background:var(--surface-alt); border-radius:6px; padding:1px 8px; }
-  .entry-time { margin-left:auto; font-family:var(--en); font-size:11px; color:var(--dim); }
+.section-title{font-size:19px;font-weight:900;margin:30px 0 12px;letter-spacing:-.03em}
 
-  .scores { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
-  .score { background:var(--accent-soft); color:var(--accent); border-radius:8px; padding:6px 12px; font-size:12.5px; font-weight:700; }
-  .score b { font-family:var(--en); font-size:14px; margin-left:3px; }
+.qcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:12px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
+.qcard h3{margin:0 0 4px;font-size:15px}
+.qcard .qmeta{font-size:12px;color:var(--muted);margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-row:last-child{margin-bottom:0}
+.bar-label{width:38%;flex:none;font-size:13px;color:var(--ink)}
+.bar-track{flex:1;height:10px;background:var(--soft);border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;background:var(--uplus);border-radius:999px}
+.bar-count{width:34px;flex:none;text-align:right;font-size:12.5px;font-weight:800;color:var(--uplus)}
 
-  .answer { margin-bottom:10px; }
-  .answer:last-child { margin-bottom:0; }
-  .answer .l { font-size:11.5px; font-weight:700; color:var(--dim); margin-bottom:3px; }
-  .answer .v { font-size:13.5px; line-height:1.55; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+.entries{display:flex;flex-direction:column;gap:10px}
+.entry{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
+.entry-top{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.entry-time{font-size:12px;color:var(--muted)}
+.entry-actions{margin-left:auto}
+.entry-actions button{border:1px solid var(--line);background:transparent;border-radius:6px;padding:3px 9px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--muted)}
+.entry-actions button:hover{color:#c0392b;border-color:#c0392b}
+.answer{margin-bottom:10px}
+.answer:last-child{margin-bottom:0}
+.answer .l{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.answer .v{font-size:13.5px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px}
+.tag{background:var(--pink);color:var(--uplus);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
 
-  .entry-actions { display:flex; gap:8px; margin-top:12px; }
-  .entry-actions button { border:1px solid var(--line); background:transparent; border-radius:6px; padding:3px 9px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--dim); }
-  .entry-actions button:hover { color:var(--danger); border-color:var(--danger); }
-
-  .empty { color:var(--dim); font-size:14px; text-align:center; padding:40px 0; }
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:40px 0}
 </style>
 </head>
 <body>
+<header class="topbar"><div class="topbar-inner"><div class="brand">LG U+</div><div class="security">LGUplus-InternalUseOnly(사내한)</div></div></header>
 <div class="wrap">
-  <div class="brand"><i></i>CUSTOMER SURVEY</div>
-  <h1>설문 응답 결과</h1>
-  <p class="subtitle">제출된 응답을 모아 보는 관리자용 페이지입니다. 응답자에게는 공유하지 마세요.</p>
+  <h1>영업현장 설문 결과</h1>
+  <p class="subtitle">기업용 AI Agent 영업현장 설문 취합 결과입니다. 관리자용 페이지이니 영업사원에게 이 링크를 공유하지 마세요.</p>
 
-  <div class="stats">
-    <div class="stat"><div class="n" id="stat-count">-</div><div class="l">전체 응답</div></div>
-    <div class="stat"><div class="n" id="stat-satisfaction">-</div><div class="l">평균 만족도</div></div>
-    <div class="stat"><div class="n" id="stat-courtesy">-</div><div class="l">평균 친절도</div></div>
-    <div class="stat"><div class="n" id="stat-revisit">-</div><div class="l">평균 재이용 의향</div></div>
+  <div class="stat-row">
+    <div class="stat"><div class="n" id="stat-count">-</div><div class="l">전체 응답 수</div></div>
+    <div class="stat"><div class="n" id="stat-propose">-</div><div class="l">"적극 제안 의향 있음" 비율</div></div>
+    <div class="stat"><div class="n" id="stat-price">-</div><div class="l">"충분히 수용 가능" 비율</div></div>
   </div>
 
-  <div class="toolbar">
-    <button type="button" class="export-btn" id="export-btn">📥 HTML로 내보내기</button>
-  </div>
+  <div class="toolbar"><button type="button" class="export-btn" id="export-btn">📥 HTML로 내보내기</button></div>
 
-  <div id="list"><div class="empty">불러오는 중...</div></div>
+  <div class="section-title">문항별 집계 (1~7번)</div>
+  <div id="agg-list"><div class="empty">불러오는 중...</div></div>
+
+  <div class="section-title">응답별 상세 (주관식 포함)</div>
+  <div id="entry-list"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCRkZIjcL__dgSbFE90NqHySIMy-6uCWhg",
-    authDomain: "reveiw-4021d.firebaseapp.com",
-    databaseURL: "https://reveiw-4021d-default-rtdb.firebaseio.com",
-    projectId: "reveiw-4021d",
-    storageBucket: "reveiw-4021d.firebasestorage.app",
-    messagingSenderId: "112787471912",
-    appId: "1:112787471912:web:f0a0de19ac8d7309cdff1d",
-    measurementId: "G-5942BZTMKP"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyCRkZIjcL__dgSbFE90NqHySIMy-6uCWhg",
+  authDomain: "reveiw-4021d.firebaseapp.com",
+  databaseURL: "https://reveiw-4021d-default-rtdb.firebaseio.com",
+  projectId: "reveiw-4021d",
+  storageBucket: "reveiw-4021d.firebasestorage.app",
+  messagingSenderId: "112787471912",
+  appId: "1:112787471912:web:f0a0de19ac8d7309cdff1d",
+  measurementId: "G-5942BZTMKP"
+};
 
-  const listEl = document.getElementById('list');
-  const exportBtn = document.getElementById('export-btn');
-  const statCount = document.getElementById('stat-count');
-  const statSatisfaction = document.getElementById('stat-satisfaction');
-  const statCourtesy = document.getElementById('stat-courtesy');
-  const statRevisit = document.getElementById('stat-revisit');
-  let currentItems = [];
+const QUESTIONS = [
+  { key: 'q1', no: '1', title: '최근 고객으로부터 AI, ChatGPT, 업무자동화 관련 문의를 받은 경험이 있습니까?', multi: false },
+  { key: 'q2', no: '2', title: '이 상품에 가장 높은 수요를 보일 것으로 생각되는 고객 유형은 무엇입니까?', multi: true },
+  { key: 'q3', no: '3', title: '고객에게 가장 매력적으로 전달될 것으로 예상되는 가치는 무엇입니까? (최대 2개)', multi: true },
+  { key: 'q4', no: '4', title: '제시된 요금제는 담당 고객에게 어느 정도 수용 가능하다고 보십니까?', multi: false },
+  { key: 'q5', no: '5', title: '본 상품을 실제 고객에게 제안할 의향이 있습니까?', multi: false },
+  { key: 'q6', no: '6', title: '실제 판매를 위해 가장 필요한 보완사항은 무엇입니까?', multi: true },
+  { key: 'q7', no: '7', title: '기업용 AI Agent를 사용하기에 적합하다고 생각되는 고객 업종은 무엇입니까?', multi: true }
+];
 
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, (ch) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[ch]));
+const aggList = document.getElementById('agg-list');
+const entryList = document.getElementById('entry-list');
+const exportBtn = document.getElementById('export-btn');
+const statCount = document.getElementById('stat-count');
+let currentItems = [];
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function tally(items, q) {
+  const counts = {};
+  items.forEach((item) => {
+    const v = item[q.key];
+    const list = q.multi ? (Array.isArray(v) ? v : []) : (v ? [v] : []);
+    list.forEach((x) => { counts[x] = (counts[x] || 0) + 1; });
+  });
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+}
+
+function renderAggregate(items) {
+  if (!items.length) {
+    aggList.innerHTML = '<div class="empty">아직 응답이 없습니다.</div>';
+    return;
   }
+  aggList.innerHTML = QUESTIONS.map((q) => {
+    const rows = tally(items, q);
+    const max = rows.length ? rows[0][1] : 1;
+    const bars = rows.map(([label, count]) => `
+      <div class="bar-row">
+        <div class="bar-label">${escapeHtml(label)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(count / max * 100).toFixed(0)}%"></div></div>
+        <div class="bar-count">${count}</div>
+      </div>
+    `).join('') || '<div class="empty" style="padding:8px 0">응답 없음</div>';
+    return `
+      <div class="qcard">
+        <h3>${escapeHtml(q.no)}. ${escapeHtml(q.title)}</h3>
+        <div class="qmeta">${q.multi ? '복수 선택' : '단일 선택'} · 총 ${items.length}건 중 집계</div>
+        ${bars}
+      </div>
+    `;
+  }).join('');
+}
 
-  function avg(items, key) {
-    if (!items.length) return '-';
-    const sum = items.reduce((s, i) => s + (Number(i[key]) || 0), 0);
-    return (sum / items.length).toFixed(1);
+function renderEntries(items) {
+  if (!items.length) {
+    entryList.innerHTML = '<div class="empty">아직 응답이 없습니다.</div>';
+    return;
   }
+  entryList.innerHTML = `<div class="entries">${items.map((item) => `
+    <div class="entry">
+      <div class="entry-top">
+        <span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span>
+        <span class="entry-actions"><button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button></span>
+      </div>
+      <div class="answer"><div class="l">1. AI 관련 고객 문의 경험</div><div class="v">${escapeHtml(item.q1 || '미응답')}</div></div>
+      <div class="answer"><div class="l">2. 수요 예상 고객</div><div class="tag-row">${(item.q2 || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('') || '<span class="v">미선택</span>'}</div></div>
+      <div class="answer"><div class="l">3. 핵심 고객가치</div><div class="tag-row">${(item.q3 || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('') || '<span class="v">미선택</span>'}</div></div>
+      <div class="answer"><div class="l">4. 요금 수용성</div><div class="v">${escapeHtml(item.q4 || '미응답')}${item.q4_comment ? ' — ' + escapeHtml(item.q4_comment) : ''}</div></div>
+      <div class="answer"><div class="l">5. 고객 제안 의향</div><div class="v">${escapeHtml(item.q5 || '미응답')}${item.q5_comment ? ' — ' + escapeHtml(item.q5_comment) : ''}</div></div>
+      <div class="answer"><div class="l">6. 판매 보완사항</div><div class="tag-row">${(item.q6 || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('') || '<span class="v">미선택</span>'}</div>${item.q6_comment ? `<div class="v" style="margin-top:6px">${escapeHtml(item.q6_comment)}</div>` : ''}</div>
+      <div class="answer"><div class="l">7. 적합 고객 업종</div><div class="tag-row">${(item.q7 || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('') || '<span class="v">미선택</span>'}</div>${item.q7_comment ? `<div class="v" style="margin-top:6px">${escapeHtml(item.q7_comment)}</div>` : ''}</div>
+      ${item.q8_comment ? `<div class="answer"><div class="l">8. 판매 지원사항 및 추가 의견</div><div class="v">${escapeHtml(item.q8_comment)}</div></div>` : ''}
+    </div>
+  `).join('')}</div>`;
+}
 
-  const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && !!firebaseConfig.databaseURL;
+const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && !!firebaseConfig.databaseURL;
 
-  if (!isConfigured) {
-    listEl.innerHTML = '<div class="empty">⚠️ Firebase 설정이 필요합니다. survey.html의 안내를 확인해 주세요.</div>';
-    exportBtn.disabled = true;
-  } else {
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const surveyRef = db.ref('surveys');
+if (!isConfigured) {
+  aggList.innerHTML = '<div class="empty">⚠️ Firebase 설정이 필요합니다. survey.html의 안내를 확인해 주세요.</div>';
+  entryList.innerHTML = '';
+  exportBtn.disabled = true;
+} else {
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const surveyRef = db.ref('surveys');
 
-    surveyRef.orderByChild('createdAt').on('value', (snapshot) => {
-      const items = [];
-      snapshot.forEach((child) => {
-        items.push({ key: child.key, ...child.val() });
-      });
-      items.reverse();
-      currentItems = items;
+  surveyRef.orderByChild('createdAt').on('value', (snapshot) => {
+    const items = [];
+    snapshot.forEach((child) => { items.push({ key: child.key, ...child.val() }); });
+    items.reverse();
+    currentItems = items;
 
-      statCount.textContent = items.length;
-      statSatisfaction.textContent = avg(items, 'satisfaction');
-      statCourtesy.textContent = avg(items, 'courtesy');
-      statRevisit.textContent = avg(items, 'revisit');
+    statCount.textContent = items.length;
+    const proposeCount = items.filter((i) => i.q5 === '적극 제안 의향 있음').length;
+    const priceCount = items.filter((i) => i.q4 === '충분히 수용 가능').length;
+    document.getElementById('stat-propose').textContent = items.length ? Math.round(proposeCount / items.length * 100) + '%' : '-';
+    document.getElementById('stat-price').textContent = items.length ? Math.round(priceCount / items.length * 100) + '%' : '-';
 
-      if (!items.length) {
-        listEl.innerHTML = '<div class="empty">아직 제출된 응답이 없습니다.</div>';
-        return;
-      }
+    renderAggregate(items);
+    renderEntries(items);
+  }, (err) => {
+    console.error(err);
+    aggList.innerHTML = '<div class="empty">불러오지 못했습니다: ' + escapeHtml(err.message) + '</div>';
+  });
 
-      listEl.innerHTML = `<div class="entries">${items.map((item) => `
-        <div class="entry">
-          <div class="entry-top">
-            <span class="entry-name">${escapeHtml(item.name || '(이름 없음)')}</span>
-            <span class="entry-contact">${escapeHtml(item.contact || '')}</span>
-            ${item.org ? `<span class="entry-org">${escapeHtml(item.org)}</span>` : ''}
-            <span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span>
-          </div>
-          <div class="scores">
-            <span class="score">만족도<b>${escapeHtml(item.satisfaction ?? '-')}</b></span>
-            <span class="score">친절도<b>${escapeHtml(item.courtesy ?? '-')}</b></span>
-            <span class="score">재이용 의향<b>${escapeHtml(item.revisit ?? '-')}</b></span>
-          </div>
-          ${item.best ? `<div class="answer"><div class="l">가장 만족스러웠던 점</div><div class="v">${escapeHtml(item.best)}</div></div>` : ''}
-          ${item.improve ? `<div class="answer"><div class="l">개선이 필요한 점</div><div class="v">${escapeHtml(item.improve)}</div></div>` : ''}
-          <div class="entry-actions">
-            <button type="button" class="delete-btn" data-key="${item.key}">🗑️ 삭제</button>
-          </div>
-        </div>
-      `).join('')}</div>`;
-    }, (err) => {
-      console.error(err);
-      listEl.innerHTML = '<div class="empty">목록을 불러오지 못했습니다: ' + escapeHtml(err.message) + '</div>';
+  entryList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.delete-btn');
+    if (!btn) return;
+    const ok = confirm('이 응답을 삭제할까요?');
+    if (!ok) return;
+    surveyRef.child(btn.dataset.key).remove().catch((err) => {
+      alert('삭제에 실패했습니다: ' + err.message);
     });
+  });
+}
 
-    listEl.addEventListener('click', (e) => {
-      const deleteBtn = e.target.closest('.delete-btn');
-      if (!deleteBtn) return;
-      const item = currentItems.find((i) => i.key === deleteBtn.dataset.key);
-      if (!item) return;
-      const ok = confirm(`"${item.name}"님의 응답을 삭제할까요?`);
-      if (!ok) return;
-      surveyRef.child(item.key).remove().catch((err) => {
-        alert('삭제에 실패했습니다: ' + err.message);
-      });
-    });
+exportBtn.addEventListener('click', () => {
+  if (!currentItems.length) {
+    alert('내보낼 응답이 없습니다.');
+    return;
   }
-
-  exportBtn.addEventListener('click', () => {
-    if (!currentItems.length) {
-      alert('내보낼 응답이 없습니다.');
-      return;
-    }
-
-    const generatedAt = new Date().toLocaleString('ko-KR');
-    const rows = currentItems.map((item) => `
-      <div class="entry">
-        <div class="entry-top">
-          <span class="entry-name">${escapeHtml(item.name || '(이름 없음)')}</span>
-          <span class="entry-contact">${escapeHtml(item.contact || '')}</span>
-          ${item.org ? `<span class="entry-org">${escapeHtml(item.org)}</span>` : ''}
-        </div>
-        <div class="scores">
-          <span class="score">만족도<b>${escapeHtml(item.satisfaction ?? '-')}</b></span>
-          <span class="score">친절도<b>${escapeHtml(item.courtesy ?? '-')}</b></span>
-          <span class="score">재이용 의향<b>${escapeHtml(item.revisit ?? '-')}</b></span>
-        </div>
-        ${item.best ? `<div class="answer"><div class="l">가장 만족스러웠던 점</div><div class="v">${escapeHtml(item.best)}</div></div>` : ''}
-        ${item.improve ? `<div class="answer"><div class="l">개선이 필요한 점</div><div class="v">${escapeHtml(item.improve)}</div></div>` : ''}
+  const generatedAt = new Date().toLocaleString('ko-KR');
+  const aggHtml = QUESTIONS.map((q) => {
+    const rows = tally(currentItems, q);
+    const max = rows.length ? rows[0][1] : 1;
+    const bars = rows.map(([label, count]) => `
+      <div class="bar-row">
+        <div class="bar-label">${escapeHtml(label)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(count / max * 100).toFixed(0)}%"></div></div>
+        <div class="bar-count">${count}</div>
       </div>
     `).join('');
+    return `<div class="qcard"><h3>${escapeHtml(q.no)}. ${escapeHtml(q.title)}</h3>${bars}</div>`;
+  }).join('');
 
-    const reportHtml = `<!DOCTYPE html>
+  const entriesHtml = currentItems.map((item) => `
+    <div class="entry">
+      <div class="entry-top"><span class="entry-time">${item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : ''}</span></div>
+      <div class="answer"><div class="l">1. AI 관련 고객 문의 경험</div><div class="v">${escapeHtml(item.q1 || '미응답')}</div></div>
+      <div class="answer"><div class="l">2. 수요 예상 고객</div><div class="v">${escapeHtml((item.q2 || []).join(', ') || '미선택')}</div></div>
+      <div class="answer"><div class="l">3. 핵심 고객가치</div><div class="v">${escapeHtml((item.q3 || []).join(', ') || '미선택')}</div></div>
+      <div class="answer"><div class="l">4. 요금 수용성</div><div class="v">${escapeHtml(item.q4 || '미응답')}${item.q4_comment ? ' — ' + escapeHtml(item.q4_comment) : ''}</div></div>
+      <div class="answer"><div class="l">5. 고객 제안 의향</div><div class="v">${escapeHtml(item.q5 || '미응답')}${item.q5_comment ? ' — ' + escapeHtml(item.q5_comment) : ''}</div></div>
+      <div class="answer"><div class="l">6. 판매 보완사항</div><div class="v">${escapeHtml((item.q6 || []).join(', ') || '미선택')}${item.q6_comment ? ' — ' + escapeHtml(item.q6_comment) : ''}</div></div>
+      <div class="answer"><div class="l">7. 적합 고객 업종</div><div class="v">${escapeHtml((item.q7 || []).join(', ') || '미선택')}${item.q7_comment ? ' — ' + escapeHtml(item.q7_comment) : ''}</div></div>
+      ${item.q8_comment ? `<div class="answer"><div class="l">8. 판매 지원사항 및 추가 의견</div><div class="v">${escapeHtml(item.q8_comment)}</div></div>` : ''}
+    </div>
+  `).join('');
+
+  const reportHtml = `<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>설문 응답 리포트</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<title>영업현장 설문 리포트</title>
 <style>
-  :root { --paper:#f6f7f5; --surface:#fff; --surface-alt:#eef1ee; --ink:#15191a; --sub:#5c655f; --dim:#8b948d; --line:#e1e5e0; --accent:#189c47; --accent-soft:#e3f5ea; --shadow:0 1px 2px rgba(20,30,20,.05),0 8px 24px rgba(20,30,20,.07); --en:'Manrope',sans-serif; --kr:'Noto Sans KR',sans-serif; }
-  @media (prefers-color-scheme: dark) { :root { --paper:#121212; --surface:#181818; --surface-alt:#1f1f1f; --ink:#fff; --sub:#bdbdbd; --dim:#8e8e8e; --line:#2c2f2c; --accent:#1ed760; --accent-soft:rgba(30,215,96,.14); --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.5); } }
-  * { box-sizing:border-box; }
-  body { margin:0; padding:48px 20px 96px; max-width:720px; margin-left:auto; margin-right:auto; background:var(--paper); color:var(--ink); font-family:var(--kr); }
-  .head { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:28px 30px; box-shadow:var(--shadow); margin-bottom:24px; }
-  .head .brand { display:flex; align-items:center; gap:8px; font-family:var(--en); font-size:11px; font-weight:800; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
-  .head .brand i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:block; }
-  .head h1 { font-size:22px; font-weight:900; margin:0 0 6px; }
-  .head .meta { color:var(--sub); font-size:13px; }
-  .entries { display:flex; flex-direction:column; gap:10px; }
-  .entry { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
-  .entry-top { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-  .entry-name { font-size:14.5px; font-weight:700; }
-  .entry-contact { font-family:var(--en); font-size:12px; color:var(--dim); }
-  .entry-org { font-size:12px; color:var(--dim); background:var(--surface-alt); border-radius:6px; padding:1px 8px; }
-  .scores { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
-  .score { background:var(--accent-soft); color:var(--accent); border-radius:8px; padding:6px 12px; font-size:12.5px; font-weight:700; }
-  .score b { font-family:var(--en); font-size:14px; margin-left:3px; }
-  .answer { margin-bottom:10px; }
-  .answer .l { font-size:11.5px; font-weight:700; color:var(--dim); margin-bottom:3px; }
-  .answer .v { font-size:13.5px; line-height:1.55; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+  :root{ --uplus:#e6007e; --ink:#17171c; --muted:#6b6b73; --line:#e6e6eb; --soft:#f7f7f9; --pink:#fff3f9; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#f3f4f7;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;padding:36px 20px 80px;max-width:820px;margin-left:auto;margin-right:auto}
+  .head{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin-bottom:22px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
+  .head h1{margin:0 0 6px;font-size:22px}
+  .head .meta{color:var(--muted);font-size:13px}
+  .section-title{font-size:17px;font-weight:900;margin:26px 0 12px}
+  .qcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:10px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
+  .qcard h3{margin:0 0 10px;font-size:14.5px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+  .bar-label{width:38%;flex:none;font-size:12.5px}
+  .bar-track{flex:1;height:9px;background:var(--soft);border-radius:999px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--uplus);border-radius:999px}
+  .bar-count{width:30px;flex:none;text-align:right;font-size:12px;font-weight:800;color:var(--uplus)}
+  .entry{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:10px;box-shadow:0 8px 24px rgba(40,20,35,.05)}
+  .entry-top{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+  .answer{margin-bottom:8px}
+  .answer .l{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px}
+  .answer .v{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 </style>
 </head>
 <body>
   <div class="head">
-    <div class="brand"><i></i>CUSTOMER SURVEY</div>
-    <h1>설문 응답 리포트</h1>
-    <div class="meta">총 ${currentItems.length}건 · 생성일 ${escapeHtml(generatedAt)}</div>
+    <h1>영업현장 설문 리포트</h1>
+    <div class="meta">기업용 AI Agent 영업현장 설문 · 총 ${currentItems.length}건 · 생성일 ${escapeHtml(generatedAt)}</div>
   </div>
-  <div class="entries">${rows}</div>
+  <div class="section-title">문항별 집계</div>
+  ${aggHtml}
+  <div class="section-title">응답별 상세</div>
+  ${entriesHtml}
 </body>
 </html>`;
 
-    const blob = new Blob([reportHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `survey-report-${new Date().toISOString().slice(0, 10)}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
+  const blob = new Blob([reportHtml], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `survey-report-${new Date().toISOString().slice(0, 10)}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
 </script>
 </body>
 </html>
