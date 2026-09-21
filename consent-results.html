@@ -54,6 +54,9 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
 .toolbar button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:800;cursor:pointer;color:var(--ink)}
 .toolbar button.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
 .toolbar button:hover{opacity:.88}
+#exportHint{font-size:12.5px;color:var(--muted);margin:-6px 0 16px;min-height:18px;line-height:1.5}
+#exportHint.ok{color:var(--green);font-weight:700}
+#exportHint.warn{color:var(--amber);font-weight:700}
 
 /* 목록 */
 .entry{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:12px}
@@ -146,13 +149,17 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
         <option value="교체미희망">교체미희망</option>
       </select>
       <span class="spacer"></span>
-      <button type="button" id="csvBtn" class="pri">CSV 내려받기</button>
+      <button type="button" id="xlsxBtn" class="pri">엑셀 내려받기</button>
+      <button type="button" id="mailBtn">메일로 보내기</button>
+      <button type="button" id="csvBtn">CSV</button>
     </div>
+    <div id="exportHint"></div>
 
     <div id="list"><div class="empty-state">불러오는 중...</div></div>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -350,32 +357,113 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
   filterConsent.addEventListener('change', render);
   filterBenefit.addEventListener('change', render);
 
-  /* ── CSV ── */
-  document.getElementById('csvBtn').addEventListener('click', function(){
-    var rows = filtered();
-    if(!rows.length){ alert('내려받을 내역이 없습니다.'); return; }
-    var head = ['제출일시','가입자이름','상호명','가입자연락처','상담일자','실소통고객','실소통연락처',
-      '팀/대리점','상담자','상담자연락처','이관동의','동의상세','연락가능일정','교체희망',
-      '고정형색상','고정형수량','스탠드형색상','스탠드형수량','벽걸이형색상','벽걸이형수량','기타요청'];
-    function q(s){ return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; }
-    var lines = [head.map(q).join(',')];
-    rows.forEach(function(i){
-      lines.push([
-        fmtTime(i.createdAt), i.customerName, i.storeName, i.customerPhone, i.consultDate,
-        i.contactName, i.contactPhone, i.agentTeam, i.agentName, i.agentPhone,
-        i.consent, i.consentDetail, i.followSchedule, i.benefit,
-        i.fixedColor, i.fixedQty, i.standColor, i.standQty, i.wallColor, i.wallQty, i.equipmentNote
-      ].map(q).join(','));
-    });
-    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  /* ── 내보내기 ── */
+  var exportHint = document.getElementById('exportHint');
+  var HEAD = ['제출일시','가입자이름','상호명','가입자연락처','상담일자','실소통고객','실소통연락처',
+    '팀/대리점','상담자','상담자연락처','이관동의','동의상세','연락가능일정','교체희망',
+    '고정형색상','고정형수량','스탠드형색상','스탠드형수량','벽걸이형색상','벽걸이형수량','기타요청'];
+  var WIDTHS = [18,11,18,15,12,11,15,18,11,15,9,28,24,12,11,10,12,11,12,11,28];
+
+  function toRow(i){
+    return [
+      fmtTime(i.createdAt), i.customerName, i.storeName, i.customerPhone, i.consultDate,
+      i.contactName, i.contactPhone, i.agentTeam, i.agentName, i.agentPhone,
+      i.consent, i.consentDetail, i.followSchedule, i.benefit,
+      i.fixedColor, i.fixedQty, i.standColor, i.standQty, i.wallColor, i.wallQty, i.equipmentNote
+    ].map(function(v){ return v == null ? '' : String(v); });
+  }
+  function stamp(){ return new Date().toISOString().slice(0,10); }
+  function hint(msg, cls){
+    exportHint.textContent = msg || '';
+    exportHint.className = cls || '';
+  }
+  function saveBlob(blob, filename){
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'uorder-consent-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  function downloadCsv(rows){
+    function q(s){ return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; }
+    var lines = [HEAD.map(q).join(',')];
+    rows.forEach(function(i){ lines.push(toRow(i).map(q).join(',')); });
+    var name = 'uorder-consent-' + stamp() + '.csv';
+    saveBlob(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' }), name);
+    return name;
+  }
+
+  // 모든 값을 문자열 셀로 기록해 전화번호 앞자리 0이 유실되지 않게 함
+  function downloadXlsx(rows){
+    if(typeof XLSX === 'undefined'){
+      var fallback = downloadCsv(rows);
+      hint('엑셀 변환 모듈을 불러오지 못해 CSV(' + fallback + ')로 내려받았습니다. 사내망에서 cdnjs 접속이 차단된 경우 발생합니다.', 'warn');
+      return fallback;
+    }
+    var ws = XLSX.utils.aoa_to_sheet([HEAD].concat(rows.map(toRow)));
+    ws['!cols'] = WIDTHS.map(function(w){ return { wch: w }; });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '이관취합');
+    var name = 'uorder-consent-' + stamp() + '.xlsx';
+    XLSX.writeFile(wb, name);
+    return name;
+  }
+
+  document.getElementById('xlsxBtn').addEventListener('click', function(){
+    var rows = filtered();
+    if(!rows.length){ alert('내려받을 내역이 없습니다.'); return; }
+    var name = downloadXlsx(rows);
+    if(exportHint.className !== 'warn'){
+      hint(rows.length + '건을 ' + name + ' 파일로 내려받았습니다. 고객 개인정보가 포함된 파일이니 보관에 유의해 주세요.', 'ok');
+    }
+  });
+
+  document.getElementById('csvBtn').addEventListener('click', function(){
+    var rows = filtered();
+    if(!rows.length){ alert('내려받을 내역이 없습니다.'); return; }
+    hint(rows.length + '건을 ' + downloadCsv(rows) + ' 파일로 내려받았습니다.', 'ok');
+  });
+
+  document.getElementById('mailBtn').addEventListener('click', function(){
+    var rows = filtered();
+    if(!rows.length){ alert('보낼 내역이 없습니다.'); return; }
+    if(!confirm(
+      '고객 개인정보가 담긴 파일을 메일로 발송합니다.\n\n' +
+      '· 사내 메일 주소로만 발송해 주세요\n' +
+      '· 외부 메일·개인 메일 발송은 삼가 주세요\n\n' +
+      rows.length + '건을 내보낼까요?'
+    )) return;
+
+    var name = downloadXlsx(rows);
+    var agree = rows.filter(function(i){ return i.consent === '동의'; }).length;
+    var disagree = rows.filter(function(i){ return i.consent === '미동의'; }).length;
+    var pending = rows.length - agree - disagree;
+
+    // 본문에는 집계만 담고, 개인정보는 첨부 파일로만 전달
+    var subject = 'U+오더 고객 이관 정보 취합 (' + stamp() + ', ' + rows.length + '건)';
+    var body = [
+      'U+오더 고객 이관 정보 취합 결과를 공유드립니다.',
+      '',
+      '· 기준 일시: ' + new Date().toLocaleString('ko-KR'),
+      '· 전체 건수: ' + rows.length + '건',
+      '· 이관 동의: ' + agree + '건',
+      '· 고민중·기타: ' + pending + '건',
+      '· 미동의: ' + disagree + '건',
+      '',
+      '상세 내역은 첨부 파일(' + name + ')을 확인해 주세요.',
+      '',
+      '※ 고객 개인정보가 포함된 파일입니다. 열람·보관에 유의해 주시고 업무 처리 후 삭제해 주세요.'
+    ].join('\n');
+
+    setTimeout(function(){
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    }, 400);
+
+    hint('메일 작성창이 열립니다. 방금 내려받은 ' + name + ' 파일을 첨부해 주세요. (메일 본문에는 집계만 들어가고 고객정보는 첨부 파일에만 담깁니다)', 'ok');
   });
 })();
 </script>
