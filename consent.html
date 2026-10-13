@@ -37,25 +37,35 @@
 <summary>⚙️</summary>
 <div class="body">
 <b>관리자용 — 처음 사용 전 설정 (한 번만)</b>
-<p style="margin:8px 0 0">제출된 내용은 Firebase Realtime Database의 <code>consents</code> 경로에 저장됩니다. 고객 개인정보가 포함되므로 <b>조회는 인증된 관리자만</b> 가능하도록 규칙을 설정해야 합니다.</p>
+<p style="margin:8px 0 0">제출된 내용은 Firebase Realtime Database의 <code>consents</code> 경로에 저장됩니다. 고객 개인정보가 포함되므로 <b>미리 등록한 관리자 계정만</b> 조회할 수 있도록 규칙을 설정해야 합니다.</p>
 <ol>
 <li>Firebase 콘솔 → Authentication → 시작하기 → <b>이메일/비밀번호</b> 사용 설정</li>
-<li>Authentication → Users → <b>사용자 추가</b>로 관리자 계정 생성</li>
+<li>Authentication → Settings → 사용자 작업 → <b>“가입 사용 중지(Enable create)”를 해제</b>
+  <span style="display:block">— 해제하지 않으면 페이지 소스의 공개 설정값으로 누구나 스스로 계정을 만들 수 있음</span></li>
+<li>Authentication → Users → <b>사용자 추가</b>로 관리자 계정 생성 후, 목록의 <b>사용자 UID</b> 복사</li>
+<li>Realtime Database → 데이터 탭에서 <code>admins</code> 노드를 만들고, 자식 키에 <b>복사한 UID</b>, 값에 <b>true</b>(불리언) 입력
+  <span style="display:block">— 관리자를 추가·해제할 때는 이 목록만 수정하면 됨</span></li>
 <li>Realtime Database → 규칙 탭에 아래 내용 게시</li>
 </ol>
 <pre>{
   "rules": {
     "feedbacks": { ".read": true, ".write": true },
     "surveys": { ".read": true, ".write": true },
+    "admins": {
+      "$uid": {
+        ".read": "auth != null &amp;&amp; $uid === auth.uid",
+        ".write": false
+      }
+    },
     "consents": {
-      ".read": "auth != null",
+      ".read": "auth != null &amp;&amp; root.child('admins').child(auth.uid).val() === true",
       "$id": {
-        ".write": "!data.exists() || auth != null"
+        ".write": "!data.exists() || (auth != null &amp;&amp; root.child('admins').child(auth.uid).val() === true)"
       }
     }
   }
 }</pre>
-<p style="margin:10px 0 0">위 규칙은 <b>제출(신규 생성)은 누구나</b> 가능하되, <b>조회·수정·삭제는 로그인한 관리자만</b> 가능하게 합니다. 제출 내역은 <b>consent-results.html</b>에서 관리자 로그인 후 확인할 수 있습니다.</p>
+<p style="margin:10px 0 0">위 규칙은 <b>제출(신규 생성)은 누구나</b> 가능하되, <b>조회·수정·삭제는 <code>admins</code> 목록에 등록된 계정만</b> 가능하게 합니다. 로그인만 된 계정은 조회되지 않고 “권한 없음” 안내가 표시됩니다. <code>admins</code> 목록은 콘솔에서만 수정할 수 있고(<code>".write": false</code>), 각 계정은 자기 자신의 등록 여부만 확인할 수 있습니다. 제출 내역은 <b>consent-results.html</b>에서 관리자 로그인 후 확인할 수 있습니다.</p>
 </div>
 </details>
 
