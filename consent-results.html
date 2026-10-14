@@ -337,6 +337,7 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
           (i.consentDetail ? cell('동의 상세', esc(i.consentDetail), true) : '') +
           (i.followSchedule ? cell('연락가능일정', esc(i.followSchedule), true) : '') +
           (i.equipmentNote ? cell('기타 요청', esc(i.equipmentNote), true) : '') +
+          (i.deliveryAddress ? cell('실수령 주소지', esc(i.deliveryAddress), true) : '') +
         '</div>' +
       '</div>';
     }).join('');
@@ -361,15 +362,16 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
   var exportHint = document.getElementById('exportHint');
   var HEAD = ['제출일시','가입자이름','상호명','가입자연락처','상담일자','실소통고객','실소통연락처',
     '팀/대리점','상담자','상담자연락처','이관동의','동의상세','연락가능일정','교체희망',
-    '고정형색상','고정형수량','스탠드형색상','스탠드형수량','벽걸이형색상','벽걸이형수량','기타요청'];
-  var WIDTHS = [18,11,18,15,12,11,15,18,11,15,9,28,24,12,11,10,12,11,12,11,28];
+    '고정형색상','고정형수량','스탠드형색상','스탠드형수량','벽걸이형색상','벽걸이형수량','기타요청','실수령주소지'];
+  var WIDTHS = [18,11,18,15,12,11,15,18,11,15,9,28,24,12,11,10,12,11,12,11,28,34];
 
   function toRow(i){
     return [
       fmtTime(i.createdAt), i.customerName, i.storeName, i.customerPhone, i.consultDate,
       i.contactName, i.contactPhone, i.agentTeam, i.agentName, i.agentPhone,
       i.consent, i.consentDetail, i.followSchedule, i.benefit,
-      i.fixedColor, i.fixedQty, i.standColor, i.standQty, i.wallColor, i.wallQty, i.equipmentNote
+      i.fixedColor, i.fixedQty, i.standColor, i.standQty, i.wallColor, i.wallQty, i.equipmentNote,
+      i.deliveryAddress
     ].map(function(v){ return v == null ? '' : String(v); });
   }
   function stamp(){ return new Date().toISOString().slice(0,10); }
