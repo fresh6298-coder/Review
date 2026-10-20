@@ -69,8 +69,35 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
 .badge.think{background:#fff4e5;color:var(--amber)}
 .badge.etc{background:#eef1f5;color:var(--muted)}
 .entry-time{margin-left:auto;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.entry-del{border:1px solid var(--line);background:transparent;border-radius:8px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.entry-del,.entry-edit{border:1px solid var(--line);background:transparent;border-radius:8px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer}
 .entry-del:hover{color:var(--red);border-color:var(--red)}
+.entry-edit:hover{color:var(--blue);border-color:var(--blue)}
+.entry-time+.entry-edit{margin-left:0}
+.entry-edited{font-size:11px;color:var(--amber);font-weight:700}
+
+/* 수정 모달 */
+#editModal{position:fixed;inset:0;background:rgba(20,20,40,.45);display:none;z-index:60;padding:24px;overflow-y:auto}
+#editModal.open{display:block}
+.edit-card{background:#fff;border-radius:20px;max-width:760px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.22)}
+.edit-head{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;border-radius:20px 20px 0 0;z-index:1}
+.edit-head h2{font-size:18px;margin:0}
+.edit-head .x{margin-left:auto;border:0;background:transparent;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+.edit-body{padding:22px 24px}
+.edit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.edit-grid .f{display:flex;flex-direction:column}
+.edit-grid .f.full{grid-column:1/-1}
+.edit-grid label{font-size:12px;font-weight:750;color:var(--muted);margin-bottom:6px}
+.edit-grid input,.edit-grid select,.edit-grid textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit}
+.edit-grid textarea{min-height:72px;resize:vertical}
+.edit-grid input:focus,.edit-grid select:focus,.edit-grid textarea:focus{outline:2px solid #9ec5ff;border-color:var(--blue)}
+.edit-sub{grid-column:1/-1;font-size:12px;font-weight:800;color:var(--blue);border-top:1px solid var(--line);padding-top:16px;margin-top:2px}
+.edit-sub:first-child{border-top:0;padding-top:0;margin-top:0}
+.edit-foot{display:flex;gap:10px;padding:16px 24px;align-items:center;position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);border-radius:0 0 20px 20px}
+.edit-foot .msg{font-size:12.5px;color:var(--red);font-weight:700;margin-right:auto}
+.edit-foot button{border-radius:11px;padding:12px 22px;font-size:14px;font-weight:800;cursor:pointer}
+#editCancel{border:1px solid var(--line);background:#fff;color:var(--ink)}
+#editSave{border:0;background:var(--blue);color:#fff}
+#editSave:disabled{background:#9db4cc;cursor:not-allowed}
 
 .rows{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
 .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:baseline}
@@ -86,6 +113,13 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
   .stats{grid-template-columns:repeat(2,1fr)}
   .rows{grid-template-columns:1fr}
   .wrap{padding:20px 14px 60px}
+  #editModal{padding:12px}
+  .edit-grid{grid-template-columns:1fr}
+  .edit-grid input,.edit-grid select,.edit-grid textarea{font-size:16px}
+  .edit-body{padding:18px 16px}
+  .edit-head{padding:16px 18px}
+  .edit-foot{padding:14px 16px;flex-wrap:wrap}
+  .edit-foot button{flex:1}
 }
 </style>
 </head>
@@ -157,6 +191,63 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
 
     <div id="list"><div class="empty-state">불러오는 중...</div></div>
   </div>
+</div>
+
+<!-- ══ 수정 ══ -->
+<div id="editModal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+  <form class="edit-card" id="editForm">
+    <div class="edit-head">
+      <h2 id="editTitle">제출 내용 수정</h2>
+      <button type="button" class="x" id="editClose" aria-label="닫기">&times;</button>
+    </div>
+    <div class="edit-body">
+      <div class="edit-grid">
+        <div class="edit-sub">고객 정보</div>
+        <div class="f"><label>가입자 이름</label><input name="customerName"></div>
+        <div class="f"><label>상호명</label><input name="storeName"></div>
+        <div class="f"><label>가입자 연락처</label><input type="tel" name="customerPhone"></div>
+        <div class="f"><label>상담일자</label><input type="date" name="consultDate"></div>
+        <div class="f"><label>실소통 고객 이름</label><input name="contactName"></div>
+        <div class="f"><label>실소통 고객 연락처</label><input type="tel" name="contactPhone"></div>
+
+        <div class="edit-sub">상담자</div>
+        <div class="f"><label>팀 / 대리점명</label><input name="agentTeam"></div>
+        <div class="f"><label>상담자 이름</label><input name="agentName"></div>
+        <div class="f"><label>상담자 연락처</label><input type="tel" name="agentPhone"></div>
+
+        <div class="edit-sub">이관 동의 · 일정</div>
+        <div class="f"><label>이관동의여부</label><select name="consent">
+          <option value="">미기재</option><option>동의</option><option>미동의</option><option>고민중</option><option>기타</option>
+        </select></div>
+        <div class="f"><label>교체 희망 항목</label><select name="benefit">
+          <option value="">미기재</option><option>배터리교체</option><option>거치대교체</option><option>교체미희망</option>
+        </select></div>
+        <div class="f full"><label>기타 및 상세내용</label><textarea name="consentDetail"></textarea></div>
+        <div class="f full"><label>연락가능일정</label><textarea name="followSchedule"></textarea></div>
+
+        <div class="edit-sub">거치대</div>
+        <div class="f"><label>고정형 색상</label><select name="fixedColor">
+          <option value="">색상</option><option>블랙</option><option>화이트</option>
+        </select></div>
+        <div class="f"><label>고정형 수량</label><input type="number" min="0" name="fixedQty"></div>
+        <div class="f"><label>스탠드형 색상</label><select name="standColor">
+          <option value="">색상</option><option>블랙</option><option>골드</option><option>로즈골드</option><option>브라운</option>
+        </select></div>
+        <div class="f"><label>스탠드형 수량</label><input type="number" min="0" name="standQty"></div>
+        <div class="f"><label>벽걸이형 색상</label><select name="wallColor">
+          <option value="">색상</option><option>블랙</option>
+        </select></div>
+        <div class="f"><label>벽걸이형 수량</label><input type="number" min="0" name="wallQty"></div>
+        <div class="f full"><label>기존 동일형 희망 또는 기타 요청사항</label><textarea name="equipmentNote"></textarea></div>
+        <div class="f full"><label>실수령 주소지</label><textarea name="deliveryAddress"></textarea></div>
+      </div>
+    </div>
+    <div class="edit-foot">
+      <span class="msg" id="editMsg"></span>
+      <button type="button" id="editCancel">취소</button>
+      <button type="submit" id="editSave">저장</button>
+    </div>
+  </form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -322,7 +413,9 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
           '<span class="entry-name">' + esc(i.customerName || '(이름 없음)') + '</span>' +
           '<span class="entry-store">' + esc(i.storeName || '-') + '</span>' +
           '<span class="badge ' + badgeClass(i.consent) + '">' + esc(i.consent || '미기재') + '</span>' +
-          '<span class="entry-time">' + esc(fmtTime(i.createdAt)) + '</span>' +
+          '<span class="entry-time">' + esc(fmtTime(i.createdAt)) +
+            (i.updatedAt ? ' <span class="entry-edited">· 수정 ' + esc(fmtTime(i.updatedAt)) + '</span>' : '') + '</span>' +
+          '<button type="button" class="entry-edit" data-key="' + esc(i.key) + '">수정</button>' +
           '<button type="button" class="entry-del" data-key="' + esc(i.key) + '">삭제</button>' +
         '</div>' +
         '<div class="rows">' +
@@ -344,6 +437,12 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
   }
 
   listEl.addEventListener('click', function(e){
+    var ed = e.target.closest('.entry-edit');
+    if(ed){
+      var target = items.filter(function(i){ return i.key === ed.dataset.key; })[0];
+      if(target) openEditor(target);
+      return;
+    }
     var btn = e.target.closest('.entry-del');
     if(!btn) return;
     var it = items.filter(function(i){ return i.key === btn.dataset.key; })[0];
@@ -357,6 +456,78 @@ p.page-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
   searchBox.addEventListener('input', render);
   filterConsent.addEventListener('change', render);
   filterBenefit.addEventListener('change', render);
+
+  /* ── 수정 ── */
+  var EDIT_FIELDS = ['customerName','storeName','customerPhone','consultDate',
+    'contactName','contactPhone','agentTeam','agentName','agentPhone',
+    'consent','benefit','consentDetail','followSchedule',
+    'fixedColor','fixedQty','standColor','standQty','wallColor','wallQty',
+    'equipmentNote','deliveryAddress'];
+
+  var editModal = document.getElementById('editModal');
+  var editForm = document.getElementById('editForm');
+  var editSave = document.getElementById('editSave');
+  var editMsg = document.getElementById('editMsg');
+  var editingKey = null;
+
+  function openEditor(it){
+    editingKey = it.key;
+    editMsg.textContent = '';
+    editSave.disabled = false;
+    EDIT_FIELDS.forEach(function(name){
+      var el = editForm.elements[name];
+      if(!el) return;
+      var v = it[name] == null ? '' : String(it[name]);
+      /* 저장된 값이 선택지에 없으면 임시 항목을 넣어 두어 조용히 지워지지 않게 함 */
+      if(el.tagName === 'SELECT' && v){
+        var has = Array.prototype.some.call(el.options, function(o){ return o.value === v; });
+        if(!has){ el.add(new Option(v + ' (기존값)', v)); }
+      }
+      el.value = v;
+    });
+    document.getElementById('editTitle').textContent =
+      '제출 내용 수정 — ' + (it.customerName || '이름 없음') + ' / ' + (it.storeName || '-');
+    editModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    var first = editForm.elements['customerName'];
+    if(first) first.focus();
+  }
+
+  function closeEditor(){
+    editingKey = null;
+    editModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('editClose').addEventListener('click', closeEditor);
+  document.getElementById('editCancel').addEventListener('click', closeEditor);
+  editModal.addEventListener('click', function(e){
+    if(e.target === editModal) closeEditor();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && editModal.classList.contains('open')) closeEditor();
+  });
+
+  editForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!editingKey) return;
+    var key = editingKey;
+    var patch = {};
+    EDIT_FIELDS.forEach(function(name){
+      var el = editForm.elements[name];
+      if(el) patch[name] = el.value.trim();
+    });
+    patch.updatedAt = firebase.database.ServerValue.TIMESTAMP;
+
+    editSave.disabled = true;
+    editMsg.textContent = '';
+    consentRef.child(key).update(patch).then(function(){
+      closeEditor();
+    }).catch(function(err){
+      editMsg.textContent = '저장에 실패했습니다: ' + err.message;
+      editSave.disabled = false;
+    });
+  });
 
   /* ── 내보내기 ── */
   var exportHint = document.getElementById('exportHint');
